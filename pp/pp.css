@@ -1,0 +1,1067 @@
+:root {
+    /* Paleta */
+    --base: #dce0e8;
+    --mantle: #bcc0cc;
+    --crust: #4c4f69;
+    --purple: #855597;
+    --sky: #04a5e5;
+    --text: #4c4f69;
+    --subtext: #4A4459;
+    --white: #F4F4F4;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--mantle);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenedor principal (el recuadro claro) que tiene todo adentro */
+.contenedor-principal {
+    background-color: #D2C6D6;
+    min-height: 90vh;
+    border-radius: 0 20px 20px 20px;
+    margin-top: 0;
+}
+
+/* Header mangastore logo */
+.navbar {
+    background-color: var(--purple);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-caja {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    /* Convierte el botón en un contenedor flexible */
+    align-items: center;
+    /* Alinea el icono y el texto verticalmente al centro */
+    justify-content: center;
+    /* Centra el contenido horizontalmente */
+    gap: 10px;
+    /* Controla el espacio exacto entre el icono (+) y el texto */
+}
+
+/* estilo de la barra de navegacion*/
+.tabs {
+    background-color: #D2C6D6;
+    display: flex;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 40px 40px 0 0;
+    width: fit-content;
+}
+
+/* Estilo para las pestañas */
+.tab {
+    border: none;
+    background: transparent;
+    padding: 8px 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--subtext);
+    font-weight: bold;
+}
+
+/* Estilo para la pestaña activa SELECCIONADA */
+.tab.active {
+    background-color: #C9ACD5;
+    color: var(--purple);
+}
+
+/* estilo para el contenido principal */
+.content-wrapper {
+    display: flex;
+    padding: 60px;
+    gap: 40px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Dashboard Card (Left Side) panel de control */
+.dashboard-card {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 25px;
+    width: 850px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Título del panel de control */
+.dashboard-card h2 {
+    text-align: center;
+    color: #9499b8;
+    margin-bottom: 30px;
+}
+
+/* Estadísticas dentro del panel de control */
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    font-size: 1.2rem;
+    color: #8c92ac;
+    font-weight: bold;
+}
+
+/* Resalta la estadística de "Ventas del Día" */
+.stat-item.highlight {
+    background-color: #e6e9ef;
+}
+
+/* Action Card (Right Side) */
+.action-card {
+    background: #acb0be;
+    width: 350px;
+    height: 350px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-circle {
+    background: #9499b8;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: -30px;
+    z-index: 1;
+}
+
+/* Icono principal dentro del círculo */
+.main-icon {
+    width: 80px;
+    height: 120px;
+    color: var(--crust);
+}
+
+/* Botón blanco de Nueva Venta */
+.btn-nueva-venta {
+    display: flex;
+    /* Convierte el botón en un contenedor flexible */
+    align-items: center;
+    /* Alinea el icono y el texto verticalmente al centro */
+    justify-content: center;
+    /* Centra el contenido horizontalmente */
+    gap: 10px;
+    /* Controla el espacio exacto entre el icono (+) y el texto */
+
+    /* Mantén tus otras propiedades */
+    background: #e6e9ef;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 60px;
+}
+
+
+/* Footer */
+.bottom-bar {
+    margin-top: auto;
+    background-color: #9499b8;
+    padding: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.exit-icon {
+    color: var(--crust);
+    cursor: pointer;
+}
+
+
+/* Estilos del Modal ventana emergente ventas */
+.modal {
+    display: none;
+    /* lo mantiene oculto */
+    position: fixed;
+    /* Hace que flote sobre todo lo demás */
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Oscurece el fondo del panel */
+}
+
+/* Contenido del Modal */
+.modal-content {
+    background-color: #f0f0f5;
+    margin: 2% auto;
+    width: 95%;
+    height: 90vh;
+    border-radius: 20px;
+    position: relative;
+    overflow: auto;
+}
+
+/* Botón de cerrar el Modal */
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #4c4f69;
+    z-index: 10;
+}
+
+/* Contenido del Modal dividido en dos columnas */
+.venta-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    height: 100%;
+}
+
+/* Columna Izquierda */
+.selection-area {
+    padding: 40px;
+    background-color: white;
+}
+
+/* Título del Modal */
+.venta-title {
+    color: #585b70;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+/* Caja de búsqueda donde se contienen los objetos*/
+.search-box-wrapper {
+    background: #ccd0da;
+    padding: 30px;
+    border-radius: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+/* Placeholder para la imagen del producto */
+.image-placeholder {
+    background: white;
+    width: 250px;
+    height: 350px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-right: 40px;
+}
+
+/* Icono dentro del placeholder */
+.image-placeholder i {
+    width: 80px;
+    height: 80px;
+    color: #ccd0da;
+}
+
+/* Grupo de entrada de búsqueda */
+.search-input-group {
+    display: flex;
+    background: white;
+    border-radius: 25px;
+    padding: 5px 15px;
+    margin-bottom: 20px;
+}
+
+/* Estilo para el circulo del icono del campo de entrada de búsqueda */
+.search-input-group input {
+    border: none;
+    outline: none;
+    flex: 1;
+    padding: 10px;
+}
+
+/* Botón de búsqueda al lado del campo de entrada */
+.btn-search {
+    background: #acb0be;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+/*input del nombre producto*/
+#display-nombre {
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 25px;
+    margin-bottom: 20px;
+    height: 20px;
+}
+
+/*input del nombre producto*/
+#display-precio {
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    border-radius: 25px;
+    margin-bottom: 20px;
+    height: 20px;
+}
+
+/*input del nombre producto*/
+#display-stock {
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 25px;
+    margin-bottom: 20px;
+    height: 20px;
+}
+
+#display-cantidad {
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    height: 20px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* incrementandor de cantidad */
+.stepper-container {
+    display: flex;
+    align-items: center;
+    background-color: #e6e9ef;
+    /* Color claro de tu interfaz */
+    border-radius: 25px;
+    width: 300px;
+    height: 20px;
+    padding: 10px 15px;
+}
+
+.stepper-container input {
+    border: none;
+    background: transparent;
+    text-align: center;
+    width: 210px;
+    margin-top: 20px;
+    font-size: 14px;
+
+}
+
+/* Ocultar las flechas por defecto del input number */
+.stepper-container input::-webkit-inner-spin-button,
+.stepper-container input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.btn-step {
+    background-color: #bcc0cc;
+    /* Color mantle/crust */
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.btn-step:hover {
+    background-color: #acb0be;
+}
+
+.btn-step svg {
+    width: 10px;
+    color: #4c4f69;
+}
+
+.btn-ag-prod {
+    background: #855597;
+    border: none;
+    width: 70px;
+    height: 50px;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    display: flex;
+    /* Convierte el botón en un contenedor flexible */
+    align-items: center;
+    /* Alinea el icono y el texto verticalmente al centro */
+    justify-content: center;
+    /* Centra el contenido horizontalmente */
+    gap: 10px;
+    /* Controla el espacio exacto entre el icono (+) y el texto */
+    margin-top: auto;
+    position: relative;
+    ;
+}
+
+.btn-visualizar {
+    background: #855597;
+    border: none;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    display: flex;
+    /* Convierte el botón en un contenedor flexible */
+    align-items: center;
+    /* Alinea el icono y el texto verticalmente al centro */
+    justify-content: center;
+    /* Centra el contenido horizontalmente */
+    gap: 10px;
+    /* Controla el espacio exacto entre el icono (+) y el texto */
+    margin: 5px;
+}
+
+/* Columna Derecha (Resumen) */
+.summary-area {
+    background-color: #acb0be;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Título del resumen */
+.venta-table {
+    width: 100%;
+    background: white;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Estilos para la tabla de resumen */
+.venta-table th {
+    background: white;
+    padding: 15px;
+    color: #585b70;
+    text-align: left;
+}
+
+.venta-table td {
+    padding: 15px;
+    border-top: 1px solid #e6e9ef;
+}
+
+/* Sección de totales al final del resumen */
+.totals-section {
+    margin-top: auto;
+    color: #313244;
+    font-weight: bold;
+}
+
+.totals-section p {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.final-total {
+    font-size: 2rem;
+    color: #40a02b;
+    border-top: 2px solid #585b70;
+    padding-top: 10px;
+}
+
+/* Botones de acción debajo del resumen */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Estilos para los botones de acción */
+.btn-pay-cash,
+.btn-pay-card,
+.btn-clear {
+    flex: 1;
+    border: none;
+    padding: 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Iconos dentro de los botones de acción */
+.btn-pay-cash {
+    background: #dce0e8;
+    color: #585b70;
+}
+
+.btn-pay-card {
+    background: #4c566a;
+    color: white;
+}
+
+.btn-clear {
+    background: #e78284;
+    color: white;
+}
+
+
+/*--------------------------MODAL PARA EL PROCESO DE VENTA -----------------------------*/
+/* Cuadrícula */
+.mangas-container {
+    background: #ccd0da;
+    border-radius: 20px;
+    padding: 30px;
+    height: 400px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 2fr));
+    gap: 5px;
+    padding: 5px 10px;
+}
+
+/* Tarjeta Base */
+.manga-card {
+    background-color: #acb0be;
+    /* Color similar a tu imagen */
+    border-radius: 30px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    /* Para apilar el contenido verticalmente */
+    align-items: center;
+    position: relative;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+/* Parte superior blanca de la tarjeta */
+.card-top {
+    background: white;
+    width: 100%;
+    border-radius: 25px;
+    padding-top: 10px;
+    position: relative;
+    margin-bottom: 10px;
+}
+
+/* Etiqueta editorial */
+.editorial-label {
+    font-size: 0.8rem;
+    color: var(--purple);
+    font-weight: bold;
+}
+
+/* Imagen del manga */
+.manga-img {
+    width: 60px;
+    height: 80px;
+    object-fit: scale-down;
+    margin: 10px 0;
+}
+
+/* Imagen del manga */
+.mangacard-img {
+    width: 120px;
+    height: 160px;
+    object-fit: cover;
+    margin: 10px;
+}
+
+
+/* Etiqueta de stock */
+.stock-label {
+    display: flex;
+    /* Activa el modo flexible */
+    align-items: center;
+    /* Alinea verticalmente al centro el icono y el texto */
+    justify-content: center;
+    /* Mantiene el contenido centrado en la tarjeta */
+    gap: 8px;
+    /* Añade un espacio uniforme entre el icono y el texto */
+    color: var(--purple);
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+/* Etiqueta de ID flotante */
+.id-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #9499b8;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 0 20px 0 20px;
+    font-size: 0.8rem;
+}
+
+
+
+/* Info inferior */
+.manga-info h3 {
+    font-size: 0.9rem;
+    margin: 5px 0;
+    color: #4c4f69;
+}
+
+.manga-info p {
+    font-size: 0.8rem;
+    margin: 0;
+    font-weight: bold;
+}
+
+.price-tag {
+    color: var(--purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+/*SECCION DE ESTILO DE LOS CONTENEDORES PERTENECIENTES A EFECTIVO Y TARJETA*/
+/* =========================
+   FONDO MODAL
+========================= */
+.fondo-forms-ec {
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(5px);
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+    box-sizing: border-box;
+
+    z-index: 2000;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+.modal-pago {
+    position: relative;
+
+    width: 100%;
+    max-width: 430px;
+
+    background: #ffffff;
+    border-radius: 26px;
+
+    padding: 35px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.22);
+
+    animation: aparecerModal 0.25s ease;
+
+    /* IMPORTANTE */
+    max-height: 90vh;
+    overflow-y: auto;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================
+   TITULOS
+========================= */
+.modal-pago h2,
+.modal-pago h3 {
+    margin: 0;
+    color: #5f4b66;
+    font-size: 28px;
+    text-align: center;
+}
+
+
+/* =========================
+   TEXTOS
+========================= */
+.modal-pago p,
+.modal-pago label {
+    color: #666;
+    font-size: 16px;
+    margin: 0;
+}
+
+
+/* =========================
+   INPUTS
+========================= */
+.modal-pago input[type="number"],
+.modal-pago input[type="text"] {
+
+    width: 100%;
+    padding: 14px;
+
+    border: 2px solid #d9c8df;
+    border-radius: 14px;
+
+    outline: none;
+
+    font-size: 16px;
+
+    transition: 0.2s ease;
+
+    box-sizing: border-box;
+}
+
+
+/* FOCUS */
+.modal-pago input:focus {
+    border-color: #8b5a96;
+
+    box-shadow:
+        0 0 0 4px rgba(139, 90, 150, 0.15);
+}
+
+
+/* =========================
+   BOTONES
+========================= */
+.modal-pago button {
+    width: 100%;
+
+    border: none;
+
+    padding: 14px;
+
+    border-radius: 14px;
+
+    background: linear-gradient(135deg,
+            #8b5a96,
+            #6d3f77);
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+
+.modal-pago button:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(139, 90, 150, 0.35);
+}
+
+
+/* =========================
+   BOTON CERRAR
+========================= */
+.btn-cerrar {
+    position: absolute;
+
+    top: 14px;
+    right: 18px;
+
+    font-size: 30px;
+
+    cursor: pointer;
+
+    color: #888;
+
+    transition: 0.2s ease;
+}
+
+
+.btn-cerrar:hover {
+    color: #e63946;
+    transform: scale(1.1);
+}
+
+
+/* =========================
+   CAJA DEL VUELTO
+========================= */
+#Cambio {
+
+    margin-top: 10px;
+
+    padding: 18px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(135deg,
+            #f6f0f8,
+            #ede2f1);
+
+    border: 2px solid #d8bfdc;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 14px;
+
+    animation: aparecerCambio 0.25s ease;
+}
+
+
+/* TEXTO VUELTO */
+#Cambio p {
+
+    margin: 0;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    color: #5f2f69;
+}
+
+
+/* BOTON FINALIZAR */
+#Cambio button {
+
+    background:
+        linear-gradient(135deg,
+            #855597,
+            #6d6bb3);
+}
+
+
+#Cambio button:hover {
+
+    box-shadow:
+        0 8px 18px var(--mantle);
+}
+
+.swal2-container {
+    z-index: 99999 !important;
+}
+
+/* =========================
+   MENSAJE ERROR EFECTIVO
+========================= */
+.error-vuelto {
+
+    background: #ffe5e5 !important;
+
+    border-color: #ffb3b3 !important;
+}
+
+
+.error-vuelto p {
+    color: #c1121f !important;
+}
+
+
+/* =========================
+   ANIMACIONES
+========================= */
+@keyframes aparecerModal {
+
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+@keyframes aparecerCambio {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   TOTAL TARJETA / EFECTIVO
+========================= */
+.total-pago {
+
+    background:
+        linear-gradient(135deg,
+            #f3ebf6,
+            #e8d8ee);
+
+    border: 2px solid #d7bfdc;
+
+    border-radius: 20px;
+
+    padding: 22px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 8px;
+
+    box-shadow:
+        inset 0 2px 10px rgba(255, 255, 255, 0.6),
+        0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+
+/* TEXTO */
+.total-pago span {
+
+    font-size: 14px;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+
+    color: #7b6a84;
+
+    font-weight: 600;
+}
+
+
+/* TOTAL */
+.total-pago h2 {
+
+    margin: 0;
+
+    font-size: 42px;
+
+    color: #5f2f69;
+
+    font-weight: 800;
+
+    line-height: 1;
+}
+
+
+/* EFECTO BRILLO */
+.total-pago::before {
+
+    content: '';
+
+    width: 80%;
+
+    height: 2px;
+
+    background:
+        linear-gradient(to right,
+            transparent,
+            rgba(255, 255, 255, 0.9),
+            transparent);
+
+    display: block;
+}
+
+.btn-eliminar-tabla {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 28px;
+    height: 28px;
+    margin: auto;
+    border-radius: 50%;
+    background: #f5d7da;
+    color: #c1121f;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+    user-select: none;
+}
+
+
+/* HOVER */
+.btn-eliminar-tabla:hover {
+    background: #c1121f;
+    color: white;
+    transform: scale(1.1);
+}
+
+
+/* ANIMACION */
+@keyframes aparecerModal {
+
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.animate-pop {
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

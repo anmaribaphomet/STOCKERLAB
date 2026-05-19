@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MangaStore - Mangas</title>
+    <link rel="stylesheet" href="mangas.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!--Libreria para las alertas-->
+    <!-- Iconos -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <header class="navbar">
+        <h1 class="logo">MangaStore</h1>
+        <button class="btn-caja"><i data-lucide="user"></i> Caja</button>
+    </header>
+
+    <main class="container">
+        <nav class="tabs">
+            <button class="tab" id="pp-nav"><i data-lucide="star"></i> Inicio</button>
+            <button class="tab" id="btn-nav-ventas"><i data-lucide="bookmark"></i> Venta</button>
+            <button class="tab active"><i data-lucide="book-open"></i> Mangas</button>
+            <button class="tab" id="btn-nav-editorial"><i data-lucide="folder"></i> Editoriales</button>
+        </nav>
+
+        <div class="contenedor-principal">
+            <section class="mangas-header">
+                <h2 class="section-title">Mangas</h2>
+                <div class="search-bar">
+                     <select id="tipo-filtro">
+                       <option value="id">ID</option>
+                       <option value="nombre">Nombre</option>
+                        <option value="autor">Autor</option>
+                     </select>
+                    <input type="text" id="input-busqueda" placeholder="Busqueda">
+                    <button class="btn-search" id="btn-search-manga"><i data-lucide="search"></i></button>
+                </div>
+            </section>
+
+            <!-- Contenedor de la cuadrícula -->
+            <div class="mangas-grid" id="mangas-container">
+                <!-- La primera tarjeta siempre es la de "Agregar" -->
+                <div class="card-add" id="btn-abrir-modal-add">
+                    <div class="inner-add">
+                        <i data-lucide="book-plus"></i>
+                    </div>
+                    <span style="margin-top: 20px; font-weight: bold;">Agregar</span>
+                </div>
+                <!-- mangas cargados de la API -->
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL PARA CREAR MANGA -->
+    <div id="modal-crear-manga" class="modal-overlay">
+        <div class="modal-content-crear animate-pop">
+            <div class="modal-header-crear">
+                <h2>Agregar Producto Final</h2>
+                <span class="close-modal-crear">&times;</span>
+            </div>
+
+            <div class="modal-body-crear">
+                <div class="datosgenerales">
+                    <h3 style="margin-top: 3px;">Datos Generales</h3>
+                    <div class="row">
+                        <div class="field">
+                            <label>Nombre *</label>
+                            <input type="text" id="nombreCrear">
+                        </div>
+                        <div class="field">
+                            <label>Volumen</label>
+                            <input type="number" id="nuevo-volumen" value="1">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>Autor</label>
+                            <input type="text" id="nuevo-autor">
+                        </div>
+                        <div class="field">
+                            <label>Precio *</label>
+                            <input type="number" id="nuevo-precio" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+                    <h3 style="margin-top: 3px;">Detalles de Inventario</h3>
+                    <div class="inventario">
+                        <div class="field">
+                            <label>Cantidad (Stock)*</label>
+                            <input type="number" id="nuevo-stock" value="1">
+                        </div>
+                        <div class="field" style="margin-top: 2px;">
+                            <label>Editorial</label>
+                            <select id="select-editorial"></select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer-crear">
+                        <button class="btn-cancelar" id="btn-cancelar-crear">Cancelar</button>
+                        <button class="btn-guardar" id="btn-confirmar-guardar">Guardar</button>
+                    </div>
+                </div>
+
+                <div class="imagen-Id">
+                    <div class="preview-box" id="nuevo-manga-preview">
+                        <span id="display-new-id">id: Pendiente</span>
+                        <i data-lucide="image" style="height: 50px; width: 50px; position: relative; top: 110px;"></i>
+                    </div>
+                    <div class="field">
+                        <label>Imagen</label>
+                        <div class="input-with-button">
+                            <input type="text" id="nuevo-url-img" placeholder="img/ejemplo.jpg">
+                            <button type="button" class="icon-inside" id="btn-probar-img">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA EDITAR MANGA -->
+    <div id="modal-editar-manga" class="modal-overlay">
+        <input type="hidden" id="edit-manga-id">
+        <div class="modal-content-crear animate-pop">
+            <div class="modal-header-crear">
+                <h2>Editar Producto Final</h2>
+                <span class="close-modal-editar">&times;</span>
+            </div>
+
+            <div class="modal-body-crear">
+                <div class="datosgenerales">
+                    <h3 style="margin-top: 3px;">Datos Generales</h3>
+                    <div class="row">
+                        <div class="field">
+                            <label>Nombre *</label>
+                            <input type="text" id="nombreEditar">
+                        </div>
+                        <div class="field">
+                            <label>Volumen</label>
+                            <input type="number" id="editar-volumen" value="1">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>Autor</label>
+                            <input type="text" id="editar-autor">
+                        </div>
+                        <div class="field">
+                            <label>Precio *</label>
+                            <input type="number" id="editar-precio" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+                    <h3 style="margin-top: 3px;">Detalles de Inventario</h3>
+                    <div class="inventario">
+                        <div class="field">
+                            <label>Cantidad (Stock)*</label>
+                            <input type="number" id="editar-stock" value="1">
+                        </div>
+                        <div class="field" style="margin-top: 2px;">
+                            <label>Editorial</label>
+                            <select id="select-editorial-editar"></select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer-crear">
+                        <button class="btn-guardar" id="btn-confirmar-editar">Guardar</button>
+                    </div>
+                </div>
+
+                <div class="imagen-Id">
+                    <div class="preview-box" id="editar-manga-preview">
+                        <span id="display-edit-id">id: Pendiente</span>
+                        <i data-lucide="image" style="height: 50px; width: 50px; position: relative; top: 110px;"></i>
+                    </div>
+                    <div class="field">
+                        <label>Imagen</label>
+                        <div class="input-with-button">
+                            <input type="text" id="editar-url-img" placeholder="img/ejemplo.jpg">
+                            <button type="button" class="icon-inside" id="btn-probar-img-editar">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bottom-bar">
+        <i data-lucide="log-out" class="exit-icon"></i>
+    </footer>
+
+    <script src="mangas.js"></script>
+</body>
+
+</html>

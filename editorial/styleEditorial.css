@@ -1,0 +1,450 @@
+/*-----------------------------------------------------SECCION PARA LAS EDITORIALES---------------------------------------------------
+*/
+:root {
+    /* Paleta */
+    --base: #dce0e8;
+    --mantle: #bcc0cc;
+    --crust: #4c4f69;
+    --purple: #855597;
+    --sky: #04a5e5;
+    --text: #4c4f69;
+    --subtext: #4A4459;
+    --white: #F4F4F4;
+}
+
+/* Contenedor principal (el recuadro claro) */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--mantle);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenedor principal (el recuadro claro) que tiene todo adentro */
+.contenedor-principal {
+    background-color: #D2C6D6;
+    min-height: 90vh;
+    border-radius: 0 20px 20px 20px;
+    margin-top: 0;
+}
+
+/* Header mangastore logo */
+.navbar {
+    background-color: var(--purple);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.btn-caja {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    /* Convierte el botón en un contenedor flexible */
+    align-items: center;
+    /* Alinea el icono y el texto verticalmente al centro */
+    justify-content: center;
+    /* Centra el contenido horizontalmente */
+    gap: 10px;
+    /* Controla el espacio exacto entre el icono (+) y el texto */
+}
+
+
+/*estilo de la barra de navegacion*/
+.tabs {
+    background-color: #D2C6D6;
+    display: flex;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 40px 40px 0 0;
+    width: fit-content;
+}
+
+/* Estilo para las pestañas */
+.tab {
+    border: none;
+    background: transparent;
+    padding: 8px 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--subtext);
+    font-weight: bold;
+}
+
+/* Estilo para la pestaña activa SELECCIONADA */
+.tab.active {
+    background-color: #C9ACD5;
+    color: var(--purple);
+}
+
+
+/* Footer */
+.bottom-bar {
+    margin-top: auto;
+    background-color: #9499b8;
+    padding: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+
+/* Contenido de la página*/
+#tablaEditorial {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    background: var(--base);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(76, 79, 105, 0.15);
+    font-family: sans-serif;
+}
+
+/* Encabezado */
+#tablaEditorial thead {
+    background: linear-gradient(135deg, var(--purple), var(--mantle));
+    color: var(--white);
+}
+
+#tablaEditorial th {
+    padding: 14px;
+    text-align: left;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Celdas */
+#tablaEditorial td {
+    padding: 12px 14px;
+    color: var(--text);
+    border-bottom: 1px solid rgba(76, 79, 105, 0.1);
+}
+
+/* Filas alternadas */
+#tablaEditorial tbody tr:nth-child(even) {
+    background: rgba(188, 192, 204, 0.25);
+}
+
+/* Hover elegante */
+#tablaEditorial tbody tr:hover {
+    background: rgba(133, 85, 151, 0.12);
+    transform: scale(1.01);
+    transition: all 0.2s ease-in-out;
+}
+
+
+/*De la tabla editorial*/
+.btn-eliminar {
+    background: rgba(60, 11, 65, 0.1);
+    border: 1px solid rgba(50, 7, 59, 0.3);
+    color: var(--text);
+    cursor: pointer;
+
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: all 0.2s ease;
+}
+
+.btn-eliminar:hover {
+    background: rgba(54, 16, 80, 0.2);
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px rgba(15, 3, 24, 0.2);
+}
+
+.btn-eliminar:active {
+    transform: scale(0.95);
+}
+
+/*Seccion de forms*/
+/* Contenedor principal que bloquea el fondo */
+.form-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(15, 10, 20, 0.6);
+    /* Un poco más oscuro para resaltar el form */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+/* El formulario propiamente dicho */
+.forms {
+    position: relative;
+    /* Cambiado de fixed a relative para mejor control dentro del flex */
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideIn 0.4s ease-out;
+}
+
+/* Animación de entrada */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.forms h3 {
+    margin-top: 0;
+    color: #2d1b33;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    text-align: center;
+    letter-spacing: -0.5px;
+}
+
+/* Campos de entrada y Selects */
+.forms input[type="text"],
+select.select-int {
+    width: 100%;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    border: 2px solid #f0eaf2;
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background-color: #fcfaff;
+    color: #4a3a4d;
+}
+
+.forms input:focus,
+select.select-int:focus {
+    outline: none;
+    border-color: #8b5a96;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(139, 90, 150, 0.15);
+}
+
+/* Estilo específico para etiquetas */
+.forms label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6a5a70;
+    margin-bottom: 8px;
+    margin-left: 4px;
+}
+
+/* Botón de envío */
+.forms button[type="submit"] {
+    width: 100%;
+    background: linear-gradient(135deg, #8b5a96 0%, #6a3d75 100%);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.forms button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139, 90, 150, 0.4);
+}
+
+.forms button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+/* Botón de cerrar (X) */
+.btn-cerrar-dinamico {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #f0eaf2;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: #8b5a96;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-cerrar-dinamico:hover {
+    background: #8b5a96;
+    color: white;
+    transform: rotate(90deg);
+}
+
+/*SECCION DESTINADA A LOS COMBOS DE LA INTEFAZ*/
+select.select-int {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #444;
+    background-color: #fdfdfd;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    appearance: none;
+    /* Quita la flecha por defecto en algunos navegadores */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 18px;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+/* Efecto al pasar el mouse */
+select.select-int:hover {
+    border-color: #8e679c;
+    background-color: #fff;
+}
+
+/* Efecto cuando el usuario hace clic (Foco) */
+select.select-int:focus {
+    outline: none;
+    border-color: #8e679c;
+    box-shadow: 0 0 8px rgba(142, 103, 156, 0.3);
+}
+
+/* Estilo para las opciones dentro del combo */
+select.select-int option {
+    padding: 10px;
+    background-color: #fff;
+    color: #333;
+}
+
+
+.buscador-ventas {
+    background: white;
+    border-radius: 20px;
+    padding: 5px 15px;
+    display: flex;
+    align-items: center;
+    width: 400px;
+    position: relative;
+    right: -60px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+
+/* SELECT */
+#tipo-filtro {
+
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    width: 100px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#tipo-filtro:focus {
+    border-color: #444;
+}
+
+/* INPUT */
+#input-busqueda {
+    border: none;
+    outline: none;
+    flex: 1;
+    padding: 8px;
+}
+
+#input-busqueda:focus {
+    border-color: #222;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+}
+
+
+/* BOTÓN */
+#btn-buscar-filtro {
+     background: #acb0be; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; transition: 0.2s;
+}
+
+#btn-buscar-filtro:hover {
+    background: var(--mantle);
+    transform: translateY(-2px);
+}
+
+
+/*SECCION PARA el contenedor con el h1 y el boton de eliminar*/
+
+.contenedor-botones {
+    padding: 10px 50px 10px 50px;
+}
+
+
+/* Botones de acciones en la tabla editoriales */
+.btns {
+    background-color: var(--purple);
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    margin: 10px 5px;
+
+}
+
+.btns:hover {
+    background-color: #28162c;
+    transform: translateY(-2px);
+}
+
+.btns1 {
+    background-color: var(--subtext);
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    margin: 10px 5px;
+
+}
+
+.btns1:hover {
+    background-color: #28162c;
+    transform: translateY(-2px);
+}

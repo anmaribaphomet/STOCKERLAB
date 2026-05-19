@@ -1,0 +1,654 @@
+:root {
+    /* Paleta  */
+    --base: #dce0e8;
+    --mantle: #bcc0cc;
+    --crust: #4c4f69;
+    --purple: #855597;
+    --sky: #04a5e5;
+    --text: #4c4f69;
+    --subtext: #4A4459;
+    --white: #F4F4F4;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--mantle);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenedor principal (el recuadro claro) que tiene todo adentro */
+.contenedor-principal {
+    background-color: #D2C6D6;
+    min-height: 90vh;
+    border-radius: 0 20px 20px 20px;
+    margin-top: 0;
+}
+
+
+/* Header mangastore logo */
+.navbar {
+    background-color: var(--purple);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+/* boton de usuario esq derecha superior */
+.btn-caja {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;          /* Convierte el botón en un contenedor flexible */
+    align-items: center;    /* Alinea el icono y el texto verticalmente al centro */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    gap: 10px;              /* Controla el espacio exacto entre el icono (+) y el texto */
+}
+
+/* estilo de la barra de navegacion*/
+.tabs {
+    background-color: #D2C6D6;
+    display: flex;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 40px 40px 0 0;
+    width: fit-content;
+}
+/* Estilo para las pestañas */
+.tab {
+    border: none;
+    background: transparent;
+    padding: 8px 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--subtext);
+    font-weight: bold;
+}
+
+/* Estilo para la pestaña activa SELECCIONADA */
+.tab.active {
+    background-color: #C9ACD5;
+    color: var(--purple);
+}
+
+
+/* Cabecera de sección */
+.mangas-header {
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+/* Título de sección */
+.section-title {
+    color: var(--purple);
+    font-size: 2.5rem;
+    margin: 0;
+}
+/* Barra de búsqueda */
+.search-bar {
+    background: white;
+    border-radius: 20px;
+    padding: 5px 15px;
+    display: flex;
+    align-items: center;
+    width: 400px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+/* Icono de búsqueda */
+.search-bar input {
+    border: none;
+    outline: none;
+    flex: 1;
+    padding: 8px;
+    transition: 0.2s;
+}
+.btn-search { background: #acb0be; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; transition: 0.2s; }
+#tipo-filtro {
+
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    width: 100px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#tipo-filtro:focus {
+    border-color: #444;
+}
+
+/* Cuadrícula */
+.mangas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+    padding: 20px 40px;
+}
+
+/* Tarjeta Base */
+.manga-card, .card-add {
+    background-color: #acb0be; /* Color similar a tu imagen */
+    border-radius: 30px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+
+.card-add {
+    background-color: #acb0be; /* Color similar a tu imagen */
+    border-radius: 30px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+/* Parte superior blanca de la tarjeta */
+.card-top {
+    background: white;
+    width: 100%;
+    border-radius: 25px;
+    padding-top: 10px;
+    position: relative;
+    margin-bottom: 10px;
+}
+/* Etiqueta editorial */
+.editorial-label {
+    font-size: 0.8rem;
+    color: var(--purple);
+    font-weight: bold;
+}
+/* Imagen del manga */
+.manga-img {
+    width: 120px;
+    height: 160px;
+    object-fit: cover;
+    margin: 10px 0;
+}
+/* Etiqueta de stock */
+.stock-label {
+    display: block;
+    color: var(--purple);
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+/* Etiqueta de ID flotante */
+.id-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #9499b8;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 0 20px 0 20px;
+    font-size: 0.8rem;
+}
+
+/* Botón editar flotante */
+.btn-edit-card {
+    position: absolute;
+    top: -15px;
+    left: -14px;
+    background: #9499b8;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease; /* Para que aparezca con una animación suave */
+}
+
+.btn-delete-card {
+    position: absolute;
+    bottom: -80px;
+    right: -7px;
+    background: #981731;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease; /* Para que aparezca con una animación suave */
+}
+
+/*  Lo mostramos cuando se hace hover en la CARD */
+.manga-card:hover .btn-delete-card {
+    opacity: 1;
+    visibility: visible;
+}
+
+.manga-card:hover .btn-edit-card {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Info inferior */
+.manga-info h3 { font-size: 0.9rem; margin: 5px 0; color: #4c4f69; }
+.manga-info p { font-size: 0.8rem; margin: 0; font-weight: bold; }
+.price-tag { color: var(--purple); display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+/* Tarjeta Agregar */
+.card-add { cursor: pointer; justify-content: center; }
+.inner-add {
+    background: white;
+    width: 185px;
+    height: 260px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+}
+
+/* Etiqueta de stock con icono */
+.stock-label {
+    display: flex;          /* Activa el modo flexible */
+    align-items: center;    /* Alinea verticalmente al centro el icono y el texto */
+    justify-content: center; /* Mantiene el contenido centrado en la tarjeta */
+    gap: 8px;               /* Añade un espacio uniforme entre el icono y el texto */
+    color: var(--purple);
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+
+/* Footer */
+.bottom-bar {
+    margin-top: auto;
+    background-color: #9499b8;
+    padding: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+/* Icono de salida */
+.exit-icon { color: var(--crust); cursor: pointer; }
+
+
+
+                                                          /* MODAL PARA CREAR MANGA*/
+
+/* Animación Pop */
+@keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pop {
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Overlay que cubre toda la pantalla */
+
+.modal-overlay {
+    display: none; /* lo mantiene oculto */
+    position: fixed; /* Hace que flote sobre todo lo demás */
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5); /* Oscurece el fondo del panel */
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Contenedor principal del modal */
+.modal-content-crear {
+    background-color: #c5bcc6;
+    margin: 2% auto;
+    width: 68%;
+    height: 90vh;
+    position: relative;
+    overflow: auto;
+}
+
+/* Cabecera del modal */
+.modal-header-crear {
+    background-color: var(--purple); /* Morado del banner */
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.modal-header-crear h2 { margin: 0; font-size: 1.5rem; }
+
+.close-modal-crear {
+    background: none; border: none;
+    color: white; font-size: 2rem; cursor: pointer;
+}
+
+/* Cuerpo del modal organizado en 2 columnas */
+.modal-body-crear {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr; /* Columna izquierda más ancha */
+    gap: 20px;
+    padding: 30px;
+}
+
+.datosgenerales{
+    background: #ccd0da;
+    padding: 40px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+   
+}
+.row {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+}
+#nombreCrear{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    height: 20px;
+    width: 270px;
+}
+
+#nuevo-volumen{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    width: 90%;
+    height: 20px;
+}
+
+#nuevo-autor{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    height: 20px;
+    width: 270px;
+}
+
+#nuevo-precio{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    height: 20px;
+    width: 90%;
+}
+
+
+.inventario {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+}
+.divider {
+    height: 1px;
+    background-color: #9499b8;
+    margin: 20px 0;
+}
+#nuevo-stock{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    height: 20px;
+    width: 90%;
+}
+
+#select-editorial{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    height: 40px;
+    width: 289px;
+}
+.btn-cancelar, .btn-guardar {
+    background-color: #a692b3;
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    position:relative;
+    top: 10px;
+    left: 145px;
+    margin: 1px 5px;
+}
+
+.preview-box {
+    background: #e6e9ef;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    height: 80%;
+    width: 90%;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+
+.input-with-button{
+    border: none;
+    padding: 5px;
+    gap: 5px;
+    flex-direction: row;
+    border-radius: 25px;
+    margin-bottom: 20px;
+    height: 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.field label {
+    display: block;      /* Asegura que ocupe su propia línea */
+    margin-bottom: 8px;  
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #4c4f69;     
+    margin-left: 5px;   
+}
+
+
+#nuevo-url-img{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: row;
+    display: flex;
+    border-radius: 25px;
+    width: 100%;
+    padding-right: 45px !important; /* Espacio para el botón */
+    box-sizing: border-box;
+}
+
+.imagen-Id{
+    background: #ccd0da;
+    padding: 30px;
+    height: 80%;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* El botón del ojo posicionado dentro del input */
+.icon-inside {
+    position: absolute;
+    right: 10px; /* Ajusta qué tan pegado al borde derecho quieres que esté */
+    background: #ccd0da; /* Color gris suave del botón `*/
+    border: 1px solid #bcc0cc;
+    border-radius: 50px;
+    width: 35px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.icon-inside:hover {
+    background: #ccd0da;
+}
+
+.icon-inside svg {
+    width: 18px;
+    color: #4c4f69;
+}
+
+/*modal editar*/
+#nombreEditar{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    height: 20px;
+    width: 270px;
+}
+
+#editar-volumen{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    width: 90%;
+    height: 20px;
+}
+
+#editar-autor{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    height: 20px;
+    width: 270px;
+}
+
+#editar-precio{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    height: 20px;
+    width: 90%;
+}
+
+#editar-stock{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    height: 20px;
+    width: 90%;
+}
+
+#select-editorial-editar{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: column;
+    display: flex;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    height: 40px;
+    width: 289px;
+}
+
+#editar-url-img{
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: row;
+    display: flex;
+    border-radius: 25px;
+    width: 100%;
+    padding-right: 45px !important; /* Espacio para el botón */
+    box-sizing: border-box;
+}
+
+.close-modal-editar {
+    background: none; border: none;
+    color: white; font-size: 2rem; cursor: pointer;
+}
+
