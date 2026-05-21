@@ -64,11 +64,11 @@ function mapearVentas(ventas) {
         const articulosHTML = listaArticulos.map(art => `
             <li class="articulo-item">
                 <div>
-                    <strong>${art.manga}</strong>
+                    <strong>${art.Nombre_Material}</strong>
                 </div>
                 <div class="articulo-info">
-                    <span>Cant: ${art.cantidad}</span>
-                    <span>$${art.subtotal}</span>
+                    <span>Cant: ${art.Cantidad}</span>
+                    <span>$${art.Tipo}</span>
                 </div>
             </li>
         `).join('');
@@ -90,17 +90,15 @@ function mapearVentas(ventas) {
             </button>
             <div class="venta-header">
                 <div>
-                    <h3>Venta #${venta.id_venta}</h3>
-                    <p>${venta.fecha}</p>
+                    <h3>Venta #${venta.Id_bit_inc}</h3>
+                    <p>${venta.Fecha}</p>
                 </div>
                 <div class="venta-total">
-                    $${venta.total_pagado}
+                    $${venta.Descripcion}
                 </div>
             </div>
             <div class="venta-body">
-                <p>
-                    <strong>Método:</strong> ${venta.metodo_pago}
-                </p>
+               
             </div>
             <button class="btn-leer-mas">
                 Ver detalles
@@ -131,7 +129,7 @@ function mapearVentas(ventas) {
         const btnEliminar = card.querySelector('.btn-eliminar');
 
         btnEliminar.addEventListener('click', () => {
-            eliminarVenta(venta.id_venta);
+            eliminarVenta(venta.Id_bit_inc);
         });
 
         // BOTÓN ACTUALIZAR
@@ -147,7 +145,7 @@ function mapearVentas(ventas) {
 }
 async function cargarVentas() {
     try {
-        const respuesta = await fetch('http://127.0.0.1:5000/ventas');
+        const respuesta = await fetch('/api/bitacora/laboratorio/1');
         const ventas = await respuesta.json();
         mapearVentas(ventas);
 
@@ -179,7 +177,7 @@ async function buscarVentas() {
         case 'id':
             const valorBusqueda = parseInt(valor);
             console.log(valorBusqueda)
-            url = `http://127.0.0.1:5000/ventas/${valorBusqueda}`;
+            url = `http://127.0.0.1:5000/incidencias/${valorBusqueda}`;
             //En este segun lo que el cliente ingreso en el input lo coloca para mandar llamar el edpoint
             break;
     }
