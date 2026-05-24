@@ -15,104 +15,102 @@ tabs.forEach(tab => {
 
 const btnInicio = document.getElementById('pp-nav');
 btnInicio.addEventListener('click', () => {
-    // Salimos de /catalogomangas/ y entramos a /pp/
+    // Salimos de /bitincidencias/ y entramos a /pp/
     window.location.href = '../pp/pp.html';
 });
 
-const btnMangas = document.getElementById('btn-nav-mangas');
+const btnMangas = document.getElementById('btn-nav-materiales');
 btnMangas.addEventListener('click', () => {
-    // Salimos de /catalogomangas/ y entramos a /pp/
-    window.location.href = '../catalogomangas/mangas.html';
+    // Salimos de /bitincidencias/ y entramos a /catalogomateriales/
+    window.location.href = '../catalogomateriales/materiales.html';
 });
 
-const btnEditorial = document.getElementById('btn-nav-editorial')
+const btnEditorial = document.getElementById('btn-nav-bitacora')
 
 btnEditorial.addEventListener('click', () => {
-    // Salimos de /catalogomangas/ y entramos a /pp/
-    window.location.href = '../editorial/editorial.html';
+    // Salimos de /bitincidencias/ y entramos a bitacora  de materiales
+    window.location.href = '../bit_materiales/bitacora.html';
 });
 
 
-//-------------------------SECCION DESTINADA A LAS VENTAS-----------------------------------------------------------------------------------
+//-------------------------SECCION DESTINADA A OBTENER LAS INCIDENCIAS-----------------------------------------------------------------------------------
 
 
-/*Funcion correspondiente al mapeo de las ventas , aqui se encuentra el card que se genera dinamicamente con la disposcion adecuada
-para mostrar en el formato incial datos :  num venta , total ,fecha y metodo de pago*/
+/*Funcion correspondiente al mapeo de las incidencias , aqui se encuentra el card que se genera dinamicamente con la disposcion adecuada
+para mostrar en el formato incial datos :  num incidencia , total ,fecha y metodo de pago*/
 
-/*NOTA : Tiene un paramatro puesto que mas abajo hay dos metodos uno para cargar todas las ventas que utiliza el edpoint
-de get y otro que se trata de un metodo filtro para buscar una venta especifica por id*/
-function mapearVentas(ventas) {
+/*NOTA : Tiene un paramatro puesto que mas abajo hay dos metodos uno para cargar todas las incidencias que utiliza el edpoint
+de get y otro que se trata de un metodo filtro para buscar una incidencia especifica por id*/
+function mapearIncidencias(incidencias) {
 
-    const contenedor = document.getElementById('contenedor-ventas');
+    const contenedor = document.getElementById('contenedor-incidencias');
     contenedor.innerHTML = '';
 
 
 
-    if (!ventas) return;
+    if (!incidencias) return;
     // SI ES UNA SOLA VENTA
     //Valida que sea una array lo que le esta pasando
-    const listaVentas = Array.isArray(ventas)
-        ? ventas
-        : [ventas];
+    const listaIncidencias = Array.isArray(incidencias)
+        ? incidencias
+        : [incidencias];
 
-    listaVentas.forEach(venta => {
+    listaIncidencias.forEach(incidencia => {
         const card = document.createElement('div');
-        card.className = 'venta-card';
-        const listaArticulos = venta.articulos || [];
+        card.className = 'incidencia-card';
 
-        //Listado con los articulos que se seleccionarion 
-        const articulosHTML = listaArticulos.map(art => `
-            <li class="articulo-item">
-                <div>
-                    <strong>${art.Nombre_Material}</strong>
-                </div>
-                <div class="articulo-info">
-                    <span>Cant: ${art.Cantidad}</span>
-                    <span>$${art.Tipo}</span>
-                </div>
-            </li>
-        `).join('');
 
         //Card
         card.innerHTML = `
 
-            <!-- BOTÓN ELIMINAR -->
-            <button 
-                class="btn-eliminar"
-                title="Eliminar venta">
-                <i data-lucide="trash-2"></i>
-            </button>
+           
             <!-- BOTÓN ACTUALIZAR -->
             <button 
                 class="btn-actualizar"
-                title="Actualizar venta">
+                title="Actualizar Incidencia">
                 <i data-lucide="pencil"></i>
             </button>
-            <div class="venta-header">
+             <!-- BOTÓN ELIMINAR -->
+            <button 
+                class="btn-eliminar"
+                title="Eliminar Incidencia">
+                <i data-lucide="trash-2"></i>
+            </button>
+            <div class="incidencia-header">
                 <div>
-                    <h3>Venta #${venta.Id_bit_inc}</h3>
-                    <p>${venta.Fecha}</p>
+                    <h3>Registro #${incidencia.id_bitacora}</h3>
+                    <p>${incidencia.fecha}</p>
                 </div>
-                <div class="venta-total">
-                    $${venta.Descripcion}
+                <div class="incidencia-descripcion">
+                    ${incidencia.tipo}
                 </div>
             </div>
-            <div class="venta-body">
+            <div class="incidencia-body">
                
             </div>
             <button class="btn-leer-mas">
                 Ver detalles
             </button>
             <div class="detalles">
-                <h4>Artículos</h4>
                 <ul>
-                    ${articulosHTML}
+                   <li class="bitacora-item">
+                <div>
+                    <strong>#${incidencia.id_material + ' - ' + incidencia.nombre_material}</strong>
+                </div>
+                <div class="bitacora-info">
+                     <span>Descripción: ${incidencia.descripcion}</span>
+                     <span>Cantidad: ${incidencia.cantidad}</span>
+                     <span>Exp. Maestro: ${incidencia.exp_maestro}</span>
+                     <span>Exp. Alumno: ${incidencia.exp_alumno}</span>
+                     
+                </div>
+            </li>
                 </ul>
             </div>
         `;
 
         // BOTÓN VER DETALLES
-        //Boton para ver los detalles que son la lista antes mencionada con los mangas que llevo el cliente
+        //Boton para ver los detalles que son la lista antes mencionada con los mangas que llevo el client
         const botonDetalles = card.querySelector('.btn-leer-mas');
         const detalles = card.querySelector('.detalles');
 
@@ -129,38 +127,38 @@ function mapearVentas(ventas) {
         const btnEliminar = card.querySelector('.btn-eliminar');
 
         btnEliminar.addEventListener('click', () => {
-            eliminarVenta(venta.Id_bit_inc);
+            eliminarIncidencia(incidencia.Id_bitacora);
         });
 
         // BOTÓN ACTUALIZAR
         //Boton para actualizar la venta
         const btnActualizar = card.querySelector('.btn-actualizar');
         btnActualizar.addEventListener('click', () => {
-            actualizarVenta(venta);
+            actualizarIncidencia(incidencia);
         });
         contenedor.appendChild(card);
     });
     // ACTIVAR ICONOS LUCIDE
     lucide.createIcons();
 }
-async function cargarVentas() {
+async function cargarIncidencias() {
     try {
-        const respuesta = await fetch('/api/bitacora/laboratorio/1');
-        const ventas = await respuesta.json();
-        mapearVentas(ventas);
-
+        const respuesta = await fetch('http://localhost:5000/api/bitacora/incidencias/laboratorio/1');
+        const incidencias = await respuesta.json();
+        mapearIncidencias(incidencias);
+        console.log(incidencias);
     } catch (error) {
-        console.error("Error al obtener las ventas:", error);
+        console.error("Error al obtener las incidencias:", error);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    cargarVentas();
+    cargarIncidencias();
 });
 
 
-//Metodo para hacer la busqueda de las ventas por id
-async function buscarVentas() {
+//Metodo para hacer la busqueda de las incidencias por id
+async function buscarIncidencias() {
     const tipoFiltro =//De un seleccion obtiene la opcion , en este caso solo es id
         document.getElementById('tipo-filtro').value;
     const valor =
@@ -169,7 +167,7 @@ async function buscarVentas() {
             .trim();//Obtiene el valor que se ingreso en el input
 
     if (valor === '') {//Cuando el input esta vacion se van a cargar todas las ventas que haya en la bd
-        cargarVentas();
+        cargarIncidencias();
         return;
     }
     let url = '';
@@ -186,19 +184,19 @@ async function buscarVentas() {
         if (!respuesta.ok) {//si el servidor no obtiene nada va colocar un mensaje en la pantalla de que el id no fue encontrado
 
             const contenedor =
-                document.getElementById('contenedor-ventas');
+                document.getElementById('contenedor-incidencias');
 
             contenedor.innerHTML = `
                 <p class="mensaje-error">
-                    No se encontró ninguna venta con ese ID
+                    No se encontró ninguna incidencia con ese ID
                 </p>
             `;
 
             return;
         }
-        const ventas = await respuesta.json();//Si obtiene la informacion correctamente
+        const incidencias = await respuesta.json();//Si obtiene la informacion correctamente
 
-        mapearVentas(ventas)//Mandara llamar el metodo para que mapee la venta encontrada
+        mapearIncidencias(incidencias)//Mandara llamar el metodo para que mapee la incidencia encontrada
 
     } catch (error) {
         console.error("Error en búsqueda:", error);
@@ -208,14 +206,14 @@ async function buscarVentas() {
 
 const search = document.getElementById('btn-buscar-filtro');
 search.addEventListener('click', () => {//Boton que al clickear ejecuta el evento para que se busque la venta
-    buscarVentas();
+    buscarIncidencias();
 });
 
 
 //FUNCION PARA CREAR DINAMICAMENTE Y CARGAR EL FORM DE ELIMINA
-async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boton que se encuentra en las cards
-    const result = await Swal.fire({//Formato para avisar al usuario si esta seguro de eliminar la venta
-        title: '¿Seguro que quieres eliminar esta venta?',
+async function eliminarIncidencia(id) {//Metodo para eliminar una incidencia desde un boton que se encuentra en las cards
+    const result = await Swal.fire({//Formato para avisar al usuario si esta seguro de eliminar la incidencia
+        title: '¿Seguro que quieres eliminar esta incidencia?',
         text: 'Esta acción no se puede deshacer',
         icon: 'warning',
         width: '280px',
@@ -230,15 +228,15 @@ async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boto
 
         try {
             const response = await fetch(
-                `http://127.0.0.1:5000/ventas/${id}`,//Hace la solicitus por medio del edpoint de eliminar venta
+                `http://127.0.0.1:5000/incidencias/${id}`,//Hace la solicitus por medio del edpoint de eliminar incidencia
                 {
                     method: 'DELETE'//En el metodo de delete
                 }
             );
             if (response.ok) {//Si la operacion se realizo con exito 
-                await Swal.fire({//Devuelve una alerta de que la venta se borro correctamente
-                    title: '¡Venta eliminada!',
-                    text: 'La venta se eliminó correctamente',
+                await Swal.fire({//Devuelve una alerta de que la incidencia se borro correctamente
+                    title: '¡Incidencia eliminada!',
+                    text: 'La incidencia se eliminó correctamente',
                     icon: 'success',
                     width: '280px',
 
@@ -246,10 +244,10 @@ async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boto
                     confirmButtonColor: '#855597'
                 });
                 location.reload();//Recarga la pagina
-            } else {//Si no es exitoso devuelce una alerta avisando al usuario que no se pude eliminar la venta
+            } else {//Si no es exitoso devuelce una alerta avisando al usuario que no se pude eliminar la incidencia
                 await Swal.fire({
                     title: 'Error',
-                    text: 'No se pudo eliminar la venta',
+                    text: 'No se pudo eliminar la incidencia',
                     icon: 'error',
                     width: '280px',
 
@@ -259,11 +257,11 @@ async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boto
             }
         } catch (error) {
 
-            console.error('Error al eliminar venta:', error);
+            console.error('Error al eliminar incidencia:', error);
 
             await Swal.fire({
                 title: 'Error',
-                text: 'Ocurrió un error al eliminar la venta',
+                text: 'Ocurrió un error al eliminar la incidencia',
                 icon: 'error',
                 width: '280px',
                 confirmButtonText: 'OK',
@@ -273,7 +271,7 @@ async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boto
     } else {
         await Swal.fire({
             title: 'Cancelado',
-            text: 'La venta no fue eliminada',
+            text: 'La incidencia no fue eliminada',
             icon: 'info',
             width: '280px',
             confirmButtonText: 'OK',
@@ -283,12 +281,12 @@ async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boto
 }
 
 /*------SECCION DESTINANDA A LO RELACIONADO CON EL MODAL DE ACTUALIZAR VENTA-----------------------------*/
-const buscarManga = document.getElementById('search-manga');
-const btnBuscarManga = document.getElementById('btn-search-manga');
+const buscarManga = document.getElementById('search-incidencia');
+const btnBuscarManga = document.getElementById('btn-search-incidencia');
 const CampoNombre = document.getElementById('display-nombre');
 const CampoPrecio = document.getElementById('display-precio');
 const CampoStock = document.getElementById('display-stock');
-const imagenManga = document.getElementById('imagen-manga');
+const imagenManga = document.getElementById('imagen-incidencia');
 
 async function buscarMangaPorNombre() {//Funcion para buscar manga por nombre 
     console.log('Buscando manga...');
@@ -578,11 +576,11 @@ matchProductos.addEventListener('click', cargarDatosTabla);
 
 //Funcion para limpiar el formulario cada que se le da click al boton de limpiar formulario
 function limpiarForm() {
-    const buscarManga = document.getElementById('search-manga');
+    const buscarManga = document.getElementById('search-incidencia');
     const CampoNombre = document.getElementById('display-nombre');
     const CampoPrecio = document.getElementById('display-precio');
     const CampoStock = document.getElementById('display-stock');
-    const imagenManga = document.getElementById('imagen-manga');
+    const imagenManga = document.getElementById('imagen-incidencia');
 
 
     buscarManga.innerHTML = "";
@@ -722,7 +720,7 @@ function vuelto(total) {
 
 //Funcion para cargar los datos de la venta al modal de actualizar venta cada que se le da click al boton de actualizar venta
 async function actualizarVenta(venta) {
-    const modal = document.getElementById('modal-venta');
+    const modal = document.getElementById('modal-incidencias');
     modal.style.display = 'flex';
 
     const tbody = document.getElementById('cart-items');
@@ -774,7 +772,7 @@ async function actualizarVenta(venta) {
 }
 //Funcion para procesar el pago de la venta , se llama cada que se le da click al boton de procesar pago en el modal de proceso de pago
 async function procesarVenta(metodoPago) {
-    const modal = document.getElementById('modal-venta');
+    const modal = document.getElementById('modal-incidencias');
     const id = modal?.dataset?.ventaId;
     const filas = document.querySelectorAll('#cart-items tr');
     if (filas.length === 0) {
@@ -833,14 +831,12 @@ async function procesarVenta(metodoPago) {
 //Funcion para limpiar el modal de actualizar venta cada que se le da click al boton de cerrar modal o al finalizar la venta
 function limpiarVentaModal() {
     // Inputs de búsqueda y producto
-    document.getElementById('search-manga').value = '';
+    document.getElementById('search-incidencia').value = '';
     document.getElementById('display-nombre').value = '';
-    document.getElementById('display-precio').value = '$0.00';
-    document.getElementById('display-stock').value = '';
     document.getElementById('display-cantidad').value = 1;
 
     // Imagen del producto
-    const imagen = document.getElementById('imagen-manga');
+    const imagen = document.getElementById('imagen-incidencia');
     imagen.innerHTML = '<i data-lucide="package-open"></i>';
 
     // Carrito
@@ -854,13 +850,13 @@ function limpiarVentaModal() {
         <h3 class="final-total">TOTAL <span>$ 00.00</span></h3>
     `;
 }
-const modal = document.getElementById("modal-venta");
+const modal = document.getElementById("modal-incidencias");
 const btnCerrar = document.querySelector(".close-modal");
-//Evento para cerrar el modal de actualizar venta cada que se le da click al boton de cerrar modal o al finalizar la venta
+//Evento para cerrar el modal de actualizar incidencia cada que se le da click al boton de cerrar modal o al finalizar la incidencia
 btnCerrar.addEventListener("click", async () => {
 
     const result = await Swal.fire({
-        title: '¿Cerrar venta?',
+        title: '¿Cerrar incidencia?',
         text: 'Se perderán los datos actuales',
         icon: 'warning',
         showCancelButton: true,

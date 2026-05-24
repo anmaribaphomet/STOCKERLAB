@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, request
 import pyodbc
-
+from flask_cors import CORS 
 app = Flask(__name__)
+CORS(app)
 
 # Función central para conectar a la base de datos
 def get_db_connection():
@@ -365,7 +366,7 @@ def obtener_bitacora_incidencias_por_laboratorio(id_lab):
          "id_bitacora": fila[0],
          "id_material": fila[1],
          "nombre_material": fila[2],
-         "tipo": fila[3],
+         "tipo": "Entrada" if fila[3] else "Salida",
          "cantidad": fila[4],
          "descripcion": fila[5],
          "fecha": fila[6].isoformat() if fila[6] else None,  # Convertimos a formato ISO para JSON

@@ -145,58 +145,70 @@ body {
 
 
 /*SECCION DEL CUERPO-MINI CARDS ESTILOS*/
-.content-ventas-p {
+.content-incidencias-p {
     width: 100%;
-    padding: 20px;
+    max-width: 1200px;
+    padding: 30px;
     box-sizing: border-box;
-    overflow-x: hidden;
+    overflow-x:hidden;
+    background: #f9f1f1;
+    margin-left: 150px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    border-radius: 20px;
+    
+     /* Agrega un margen superior para separar del header */
 }
 
-#contenedor-ventas {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+#contenedor-incidencias {
+    display:flex;
+    flex-direction: column;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
     gap: 20px;
     width: 95%;
     margin: 0 auto;
     box-sizing: border-box;
+    align-items: center;
+     /* Centra verticalmente las cards dentro del contenedor */
 }
 
-.venta-card {
+.incidencia-card {
     position: relative;
-    width: 100%;
-    max-width: 350px;
+    width: 90%;
     background: var(--base);
     border-radius: 15px;
     /* ARRIBA | DERECHA | ABAJO | IZQUIERDA */
     padding: 70px 18px 18px 18px;
     box-sizing: border-box;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    justify-self: center;
+     transition: transform 0.2s ease, box-shadow 0.2s ease;
+     margin-bottom: 20px;
+     
 }
 
-.venta-card:hover {
+.incidencia-card:hover {
     transform: translateY(-4px);
 }
 
-.venta-header {
+.incidencia-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: left;
     margin-bottom: 15px;
 }
 
-.venta-header h3 {
+.incidencia-header h3 {
     margin: 0;
     font-size: 18px;
 }
 
-.venta-header p {
+.incidencia-header p {
     margin: 5px 0 0;
     color: #777;
     font-size: 13px;
 }
 
-.venta-total {
+.incidencia-descripcion {
     background: var(--purple);
     color: white;
     padding: 10px 14px;
@@ -205,7 +217,7 @@ body {
     font-size: 16px;
 }
 
-.venta-body {
+.incidencia-body {
     margin-bottom: 15px;
     font-size: 14px;
 }
@@ -245,15 +257,16 @@ body {
     margin: 0;
 }
 
-.articulo-item {
+.bitacora-item {
     background: #f5f5f5;
     border-radius: 10px;
     padding: 10px;
     margin-bottom: 10px;
 }
 
-.articulo-info {
+.bitacora-item .bitacora-info {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     margin-top: 5px;
     font-size: 13px;
@@ -304,16 +317,17 @@ select.select-int option {
 
 
 
-/*BUSCADOR DE VENTAS*/
-.buscador-ventas {
+/*BUSCADOR DE INCIDENCIAS*/
+.buscador-incidencias {
    background: white;
     border-radius: 20px;
     padding: 5px 15px;
     display: flex;
     align-items: center;
-    width: 400px;
+    width: 700px;
     position: relative;
-    right: -60px;
+    right: -110px;
+    margin-bottom: 50px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
@@ -326,7 +340,7 @@ select.select-int option {
     border-radius: 10px;
     font-size: 14px;
     outline: none;
-    width: 100px;
+    width: 160px;
     text-align: center;
     cursor: pointer;
     transition: 0.2s;
@@ -343,6 +357,8 @@ select.select-int option {
     outline: none;
     flex: 1;
     padding: 8px;
+    margin-left: 15px;
+    margin-right: 15px;
 }
 
 #input-busqueda:focus {
@@ -364,9 +380,7 @@ select.select-int option {
 
 /*SECCION PARA el contenedor con el h1 y el boton de eliminar*/
 
-.contenedor-botones {
-    padding: 10px 50px 10px 50px;
-}
+
 
 /*holi*/
 
@@ -379,6 +393,10 @@ select.select-int option {
     border-radius: 20px;
     cursor: pointer;
     margin: 10px 5px;
+    margin-left: 1050px;
+     /* Agrega un margen izquierdo para separar del título */
+     transition: background-color 0.3s, transform 0.2s;
+     margin-bottom: 30px;
 
 }
 
@@ -406,7 +424,7 @@ select.select-int option {
 }
 
 
-.venta-card {
+.incidencia-card {
     position: relative;
 }
 
@@ -497,7 +515,7 @@ select.select-int option {
 }
 
 /* Contenido del Modal dividido en dos columnas */
-.venta-grid {
+.incidencia-grid {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     height: 100%;
@@ -510,7 +528,7 @@ select.select-int option {
 }
 
 /* Título del Modal */
-.venta-title {
+.incidencia-title {
     color: #585b70;
     font-size: 2.5rem;
     margin-bottom: 20px;
@@ -727,7 +745,7 @@ select.select-int option {
 }
 
 /* Título del resumen */
-.venta-table {
+.incidencia-table {
     width: 100%;
     background: white;
     border-collapse: collapse;
@@ -736,14 +754,14 @@ select.select-int option {
 }
 
 /* Estilos para la tabla de resumen */
-.venta-table th {
+.incidencia-table th {
     background: white;
     padding: 15px;
     color: #585b70;
     text-align: left;
 }
 
-.venta-table td {
+.incidencia-table td {
     padding: 15px;
     border-top: 1px solid #e6e9ef;
 }
@@ -1253,4 +1271,30 @@ select.select-int option {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+
+.btns {
+    background-color: var(--purple);
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    position: relative;
+    font-size: 14px;
+    right: 5px;
+     /* Agrega un margen izquierdo para separar del título */
+     transition: background-color 0.3s, transform 0.2s;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    
+    
+
+}
+
+.btns:hover {
+    background-color: #28162c;
+    transform: translateY(-2px);
+
 }
