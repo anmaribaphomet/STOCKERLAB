@@ -14,27 +14,34 @@
     <!--SECCION DE MENU-->
     <header class="navbar">
         <h1 class="logo">STOCKERLAB</h1>
-        <button class="btn-caja"><i data-lucide="user"></i> Caja</button>
+        <button class="btn-caja"><i data-lucide="user"></i> Usuario</button>
     </header>
 
     <nav class="tabs">
         <button class="tab" id="pp-nav"><i data-lucide="star"></i> Inicio</button>
-        <button class="tab active"><i data-lucide="bookmark"></i> Venta</button>
-        <button class="tab" id="btn-nav-mangas"><i data-lucide="book-open"></i> Mangas</button>
-        <button class="tab" id="btn-nav-editorial"><i data-lucide="folder"></i> Editoriales</button>
+        <button class="tab" id="btn-nav-materiales"><i data-lucide="book-open"></i> Materiales</button>
+        <button class="tab" id="btn-nav-bitacora"><i data-lucide="folder"></i> Bitácora de Materiales</button>
+        <button class="tab active"><i data-lucide="bookmark"></i> Incidencias</button>
     </nav>
 
-    <!--SECCION PARA VENTAS-->
+    <!--SECCION PARA INCIDENCIAS-->
     <div class="contenedor-principal">
         <main class="container">
-            <!-- Menú de navegación de Ventas -->
-            <div class="contenedor-botones">
-                <h1>HISTORIAL DE VENTAS</h1>
-            </div>
-            <div class="buscador-ventas">
 
+                </button>
+            <!-- Menú de navegación de Incidencias -->
+            <div class="contenedor-botones">
+                <h1 style="margin-top: 2%; margin-left: 120px;">BITÁCORA DE INCIDENCIAS</h1>
+               
+            </div>
+         
+            <div class="buscador-incidencias">
+               
                 <select id="tipo-filtro">
                     <option value="id">ID</option>
+                    <option value="Profesor">Profesor</option>
+                    <option value="Alumno"> Alumno</option>
+
                 </select>
 
                 <input type="text" id="input-busqueda" placeholder="Buscar">
@@ -42,139 +49,22 @@
                 <button id="btn-buscar-filtro">
                     <i data-lucide="search"></i>
                 </button>
-
             </div>
+            <div class="content-incidencias-p">
+             <input type="button" id="btnagregar" class="btns" data-lucide="plus" onclick="mapForm('agregar')">
 
-            <div class="content-ventas-p">
-                <div id="contenedor-ventas">
+                <div id="contenedor-incidencias">
 
-                    <!--INSERTAR LAS CARDS DE VENTAS-->
+
+                    <!--INSERTAR LAS CARDS DE INCIDENCIAS-->
 
                 </div>
             </div>
 
-            <div id="Form-ventas" class="">
+            <div id="Form-incidencias" class="form-overlay">
 
             </div>
         </main>
-
-
-        <div id="modal-venta" class="modal animate-pop">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-
-                <div class="venta-grid">
-                    <!-- Columna Izquierda: Búsqueda y Selección -->
-                    <div class="selection-area">
-                        <h2 class="venta-title">Venta</h2>
-                        <div class="search-box-wrapper">
-                            <div class="image-placeholder " id="imagen-manga">
-                                <i data-lucide="package-open"></i>
-                            </div>
-                            <div class="inputs-row">
-                                <div class="search-input-group">
-                                    <input type="text" placeholder="Nombre del Producto" id="search-manga">
-                                    <button class="btn-search" id="btn-search-manga"><i
-                                            data-lucide="search"></i></button>
-                                </div>
-                                <div class="info-row">
-                                    <div class="field">
-                                        <label>Nombre Producto:</label>
-                                        <input type="text" readonly id="display-nombre">
-                                    </div>
-                                    <div class="field">
-                                        <label>Valor ponderado:</label>
-                                        <input type="text" readonly value="$0.00" id="display-precio">
-                                    </div>
-                                    <div class="field">
-                                        <label>Stock Disponible:</label>
-                                        <input type="text" readonly id="display-stock">
-                                    </div>
-                                    <div class="field">
-                                        <label>Cantidad:</label>
-                                        <div class="stepper-container">
-                                            <button type="button" class="btn-step" id="btn-minus">
-                                                <i data-lucide="minus"></i>
-                                            </button>
-                                            <input type="number" readonly id="display-cantidad" value="1">
-                                            <button type="button" class="btn-step" id="btn-plus">
-                                                <i data-lucide="plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn-ag-prod" id="btn-agregar-producto"><i
-                                    data-lucide="arrow-right"></i></button>
-                        </div>
-
-                        <div class="visualizar-container">
-                            <button class="btn-visualizar" id="btn-visualizar-mangas"><i data-lucide="arrow-right"></i>
-                                Visualizar Productos</button>
-                        </div>
-
-                        <div class="mangas-container" id="mangas-list-container">
-
-
-                            <!-- Espacio para la lista de productos filtrados -->
-                        </div>
-                    </div>
-
-                    <!-- Columna Derecha: Resumen de Carrito y Totales -->
-                    <div class="summary-area">
-                        <div class="table-wrapper">
-                            <table class="venta-table">
-                                <thead>
-                                    <tr>
-                                        <th>Numero</th>
-                                        <th>Producto</th>
-                                        <th>Cantidad</th>
-                                        <th>Precio</th>
-                                        <th>Opt</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="cart-items">
-                                    <!-- Filas dinámicas  -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="totals-section">
-                            <p>SUBTOTAL <span>$ 00.00</span></p>
-                            <p>IMPUESTO <span>$ 00.00</span></p>
-                            <p>DESCUENTO <span>$ 00.00</span></p>
-                            <h3 class="final-total">TOTAL <span>$ 00.00</span></h3>
-                        </div>
-
-                        <div class="action-buttons">
-                            <button class="btn-clear" id="limpiar-tabla">
-                                <i data-lucide="trash-2"></i>
-                                Limpiar
-                            </button>
-
-                            <button type="button" id="btn-cash" class="btn-pay-cash"
-                                onclick="cardsEfectivoTarjeta('Efectivo')">
-                                <i data-lucide="dollar-sign"></i>
-                                Efectivo
-                            </button>
-
-                            <button type="button" id="btn-card" class="btn-pay-card"
-                                onclick="cardsEfectivoTarjeta('Tarjeta')">
-                                <i data-lucide="credit-card"></i>
-                                Tarjeta
-                            </button>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!--DIV PARA INTERTAR DOS CARD-->
-        <div id="PantallaProceso" class="fondo-forms-ec">
-
-            <!--Insertar Contenido desde JS-->
-        </div>
 
     </div>
     <footer class="bottom-bar">
