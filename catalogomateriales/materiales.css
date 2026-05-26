@@ -691,6 +691,18 @@ body {
     box-sizing: border-box;
 }
 
+#editarif-url-img {
+    background: #e6e9ef;
+    border: none;
+    padding: 10px;
+    flex-direction: row;
+    display: flex;
+    border-radius: 25px;
+    width: 100%;
+    padding-right: 45px !important;
+    /* Espacio para el botón */
+    box-sizing: border-box;
+}
 .close-modal-editar {
     background: none;
     border: none;

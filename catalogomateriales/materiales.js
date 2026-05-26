@@ -359,7 +359,7 @@ async function montareditarMaterial(id, event) {
             // ============================================
 
             const inputImg =
-                document.getElementById('editar-url-img');
+                document.getElementById('editarif-url-img');
 
             if (inputImg) {
 
@@ -378,7 +378,7 @@ async function montareditarMaterial(id, event) {
             // ============================================
 
             const preview =
-                document.getElementById('preview-placeholder');
+                document.getElementById('preview2-placeholder');
 
             if (preview) {
 

@@ -1,7 +1,6 @@
 import os
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
-import uuid # Para generar nombres de archivo únicos
 from flask import Flask, jsonify, request
 import pyodbc
 from flask_cors import CORS
@@ -20,8 +19,8 @@ def get_db_connection():
    #conexion maria
      conexion = pyodbc.connect(
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        #'SERVER=DESKTOP-RO62CP8\\MARILUBERSK;'
-        'SERVER=localhost\\SQLEXPRESS;'
+        'SERVER=DESKTOP-RO62CP8\\MARILUBERSK;'
+        #'SERVER=localhost\\SQLEXPRESS;'
         'DATABASE=stockerlab;'
         'UID=Super_Stocker;'
         'PWD=Windows2016;'  
