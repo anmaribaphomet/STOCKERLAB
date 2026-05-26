@@ -29,7 +29,7 @@ body {
 }
 
 
-/* Header mangastore logo */
+/* Header STOKCER LAB logo */
 .navbar {
     background-color: var(--purple);
     color: white;
@@ -38,6 +38,7 @@ body {
     justify-content: space-between;
     align-items: center;
 }
+
 /* boton de usuario esq derecha superior */
 .btn-caja {
     background: rgba(255, 255, 255, 0.2);
@@ -46,10 +47,14 @@ body {
     padding: 8px 15px;
     border-radius: 20px;
     cursor: pointer;
-    display: flex;          /* Convierte el botón en un contenedor flexible */
-    align-items: center;    /* Alinea el icono y el texto verticalmente al centro */
-    justify-content: center; /* Centra el contenido horizontalmente */
-    gap: 10px;              /* Controla el espacio exacto entre el icono (+) y el texto */
+    display: flex;
+    /* Convierte el botón en un contenedor flexible */
+    align-items: center;
+    /* Alinea el icono y el texto verticalmente al centro */
+    justify-content: center;
+    /* Centra el contenido horizontalmente */
+    gap: 10px;
+    /* Controla el espacio exacto entre el icono (+) y el texto */
 }
 
 /* estilo de la barra de navegacion*/
@@ -61,6 +66,7 @@ body {
     border-radius: 40px 40px 0 0;
     width: fit-content;
 }
+
 /* Estilo para las pestañas */
 .tab {
     border: none;
@@ -83,18 +89,20 @@ body {
 
 
 /* Cabecera de sección */
-.mangas-header {
+.material-header {
     padding: 20px 40px;
     display: flex;
     align-items: center;
     gap: 30px;
 }
+
 /* Título de sección */
 .section-title {
     color: var(--purple);
     font-size: 2.5rem;
     margin: 0;
 }
+
 /* Barra de búsqueda */
 .search-bar {
     background: white;
@@ -103,8 +111,9 @@ body {
     display: flex;
     align-items: center;
     width: 400px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 /* Icono de búsqueda */
 .search-bar input {
     border: none;
@@ -113,7 +122,17 @@ body {
     padding: 8px;
     transition: 0.2s;
 }
-.btn-search { background: #acb0be; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; transition: 0.2s; }
+
+.btn-search {
+    background: #acb0be;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
 #tipo-filtro {
 
     padding: 10px 14px;
@@ -132,7 +151,7 @@ body {
 }
 
 /* Cuadrícula */
-.mangas-grid {
+.material-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 25px;
@@ -140,8 +159,10 @@ body {
 }
 
 /* Tarjeta Base */
-.manga-card, .card-add {
-    background-color: #acb0be; /* Color similar a tu imagen */
+.material-card,
+.card-add {
+    background-color: #acb0be;
+    /* Color similar a tu imagen */
     border-radius: 30px;
     padding: 15px;
     display: flex;
@@ -154,7 +175,8 @@ body {
 
 
 .card-add {
-    background-color: #acb0be; /* Color similar a tu imagen */
+    background-color: #acb0be;
+    /* Color similar a tu imagen */
     border-radius: 30px;
     padding: 15px;
     display: flex;
@@ -174,19 +196,22 @@ body {
     position: relative;
     margin-bottom: 10px;
 }
+
 /* Etiqueta editorial */
 .editorial-label {
     font-size: 0.8rem;
     color: var(--purple);
     font-weight: bold;
 }
-/* Imagen del manga */
-.manga-img {
+
+/* Imagen del material */
+.manterial-img {
     width: 120px;
     height: 160px;
     object-fit: cover;
     margin: 10px 0;
 }
+
 /* Etiqueta de stock */
 .stock-label {
     display: block;
@@ -210,8 +235,8 @@ body {
 /* Botón editar flotante */
 .btn-edit-card {
     position: absolute;
-    top: -15px;
-    left: -14px;
+    top: 10px;
+    left: 10px;
     background: #9499b8;
     border: none;
     width: 40px;
@@ -224,13 +249,14 @@ body {
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease; /* Para que aparezca con una animación suave */
+    transition: all 0.3s ease;
+    /* Para que aparezca con una animación suave */
 }
 
 .btn-delete-card {
     position: absolute;
-    bottom: -80px;
-    right: -7px;
+    bottom: 10px;
+    right: 10px;
     background: #981731;
     border: none;
     width: 30px;
@@ -243,27 +269,48 @@ body {
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease; /* Para que aparezca con una animación suave */
+    transition: all 0.3s ease;
+    /* Para que aparezca con una animación suave */
 }
 
 /*  Lo mostramos cuando se hace hover en la CARD */
-.manga-card:hover .btn-delete-card {
+.material-card:hover .btn-delete-card {
     opacity: 1;
     visibility: visible;
 }
 
-.manga-card:hover .btn-edit-card {
+.material-card:hover .btn-edit-card {
     opacity: 1;
     visibility: visible;
 }
 
 /* Info inferior */
-.manga-info h3 { font-size: 0.9rem; margin: 5px 0; color: #4c4f69; }
-.manga-info p { font-size: 0.8rem; margin: 0; font-weight: bold; }
-.price-tag { color: var(--purple); display: flex; align-items: center; justify-content: center; gap: 4px; }
+.material-info h3 {
+    font-size: 0.9rem;
+    margin: 5px 0;
+    color: #4c4f69;
+}
+
+.material-info p {
+    font-size: 0.8rem;
+    margin: 0;
+    font-weight: bold;
+}
+
+.price-tag {
+    color: var(--purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
 
 /* Tarjeta Agregar */
-.card-add { cursor: pointer; justify-content: center; }
+.card-add {
+    cursor: pointer;
+    justify-content: center;
+}
+
 .inner-add {
     background: white;
     width: 185px;
@@ -277,10 +324,14 @@ body {
 
 /* Etiqueta de stock con icono */
 .stock-label {
-    display: flex;          /* Activa el modo flexible */
-    align-items: center;    /* Alinea verticalmente al centro el icono y el texto */
-    justify-content: center; /* Mantiene el contenido centrado en la tarjeta */
-    gap: 8px;               /* Añade un espacio uniforme entre el icono y el texto */
+    display: flex;
+    /* Activa el modo flexible */
+    align-items: center;
+    /* Alinea verticalmente al centro el icono y el texto */
+    justify-content: center;
+    /* Mantiene el contenido centrado en la tarjeta */
+    gap: 8px;
+    /* Añade un espacio uniforme entre el icono y el texto */
     color: var(--purple);
     font-weight: bold;
     padding-bottom: 10px;
@@ -295,17 +346,28 @@ body {
     display: flex;
     justify-content: flex-end;
 }
+
 /* Icono de salida */
-.exit-icon { color: var(--crust); cursor: pointer; }
+.exit-icon {
+    color: var(--crust);
+    cursor: pointer;
+}
 
 
 
-                                                          /* MODAL PARA CREAR MANGA*/
+/* MODAL PARA CREAR MATERIAL*/
 
 /* Animación Pop */
 @keyframes popIn {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .animate-pop {
@@ -315,14 +377,17 @@ body {
 /* Overlay que cubre toda la pantalla */
 
 .modal-overlay {
-    display: none; /* lo mantiene oculto */
-    position: fixed; /* Hace que flote sobre todo lo demás */
-    z-index: 1000; 
+    display: none;
+    /* lo mantiene oculto */
+    position: fixed;
+    /* Hace que flote sobre todo lo demás */
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5); /* Oscurece el fondo del panel */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Oscurece el fondo del panel */
     justify-content: center;
     align-items: center;
 }
@@ -333,14 +398,16 @@ body {
     background-color: #c5bcc6;
     margin: 2% auto;
     width: 68%;
-    height: 90vh;
+    height: auto;
     position: relative;
     overflow: auto;
+    border-radius: 10px;
 }
 
 /* Cabecera del modal */
 .modal-header-crear {
-    background-color: var(--purple); /* Morado del banner */
+    background-color: var(--purple);
+    /* Morado del banner */
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
@@ -348,22 +415,29 @@ body {
     color: white;
 }
 
-.modal-header-crear h2 { margin: 0; font-size: 1.5rem; }
+.modal-header-crear h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
 
 .close-modal-crear {
-    background: none; border: none;
-    color: white; font-size: 2rem; cursor: pointer;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
 }
 
 /* Cuerpo del modal organizado en 2 columnas */
 .modal-body-crear {
     display: grid;
-    grid-template-columns: 1.5fr 1fr; /* Columna izquierda más ancha */
+    grid-template-columns: 1.5fr 1fr;
+    /* Columna izquierda más ancha */
     gap: 20px;
     padding: 30px;
 }
 
-.datosgenerales{
+.datosgenerales {
     background: #ccd0da;
     padding: 40px;
     border-radius: 20px;
@@ -371,18 +445,21 @@ body {
     flex-direction: column;
     gap: 20px;
 }
+
 .field {
     display: flex;
     flex-direction: column;
     gap: 5px;
-   
+
 }
+
 .row {
     display: flex;
     flex-direction: row;
     gap: 30px;
 }
-#nombreCrear{
+
+#nombreCrear {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -394,7 +471,7 @@ body {
     width: 270px;
 }
 
-#nuevo-volumen{
+#cantidad-material {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -406,54 +483,7 @@ body {
     height: 20px;
 }
 
-#nuevo-autor{
-    background: #e6e9ef;
-    border: none;
-    padding: 10px;
-    flex-direction: column;
-    display: flex;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    height: 20px;
-    width: 270px;
-}
-
-#nuevo-precio{
-    background: #e6e9ef;
-    border: none;
-    padding: 10px;
-    flex-direction: column;
-    display: flex;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    height: 20px;
-    width: 90%;
-}
-
-
-.inventario {
-    display: flex;
-    flex-direction: row;
-    gap: 30px;
-}
-.divider {
-    height: 1px;
-    background-color: #9499b8;
-    margin: 20px 0;
-}
-#nuevo-stock{
-    background: #e6e9ef;
-    border: none;
-    padding: 10px;
-    flex-direction: column;
-    display: flex;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    height: 20px;
-    width: 90%;
-}
-
-#select-editorial{
+#select-editorial {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -464,14 +494,16 @@ body {
     height: 40px;
     width: 289px;
 }
-.btn-cancelar, .btn-guardar {
+
+.btn-cancelar,
+.btn-guardar {
     background-color: #a692b3;
     border: none;
     padding: 10px 20px;
     color: white;
     border-radius: 20px;
     cursor: pointer;
-    position:relative;
+    position: relative;
     top: 10px;
     left: 145px;
     margin: 1px 5px;
@@ -490,7 +522,7 @@ body {
 }
 
 
-.input-with-button{
+.input-with-button {
     border: none;
     padding: 5px;
     gap: 5px;
@@ -505,16 +537,17 @@ body {
 }
 
 .field label {
-    display: block;      /* Asegura que ocupe su propia línea */
-    margin-bottom: 8px;  
+    display: block;
+    /* Asegura que ocupe su propia línea */
+    margin-bottom: 8px;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #4c4f69;     
-    margin-left: 5px;   
+    color: #4c4f69;
+    margin-left: 5px;
 }
 
 
-#nuevo-url-img{
+#nuevo-url-img {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -522,11 +555,12 @@ body {
     display: flex;
     border-radius: 25px;
     width: 100%;
-    padding-right: 45px !important; /* Espacio para el botón */
+    padding-right: 45px !important;
+    /* Espacio para el botón */
     box-sizing: border-box;
 }
 
-.imagen-Id{
+.imagen-Id {
     background: #ccd0da;
     padding: 30px;
     height: 80%;
@@ -537,11 +571,20 @@ body {
     gap: 20px;
 }
 
+.material-img {
+    width: 120px;
+    height: 160px;
+    object-fit: cover;
+    margin: 10px 0;
+}
+
 /* El botón del ojo posicionado dentro del input */
 .icon-inside {
     position: absolute;
-    right: 10px; /* Ajusta qué tan pegado al borde derecho quieres que esté */
-    background: #ccd0da; /* Color gris suave del botón `*/
+    right: 10px;
+    /* Ajusta qué tan pegado al borde derecho quieres que esté */
+    background: #ccd0da;
+    /* Color gris suave del botón `*/
     border: 1px solid #bcc0cc;
     border-radius: 50px;
     width: 35px;
@@ -563,7 +606,7 @@ body {
 }
 
 /*modal editar*/
-#nombreEditar{
+#nombreEditar {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -575,7 +618,7 @@ body {
     width: 270px;
 }
 
-#editar-volumen{
+#editar-cantidad {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -587,7 +630,7 @@ body {
     height: 20px;
 }
 
-#editar-autor{
+#editar-autor {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -599,7 +642,7 @@ body {
     width: 270px;
 }
 
-#editar-precio{
+#editar-precio {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -611,7 +654,7 @@ body {
     width: 90%;
 }
 
-#editar-stock{
+#editar-stock {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -623,7 +666,7 @@ body {
     width: 90%;
 }
 
-#select-editorial-editar{
+#select-editorial-editar {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -635,7 +678,7 @@ body {
     width: 289px;
 }
 
-#editar-url-img{
+#editar-url-img {
     background: #e6e9ef;
     border: none;
     padding: 10px;
@@ -643,12 +686,15 @@ body {
     display: flex;
     border-radius: 25px;
     width: 100%;
-    padding-right: 45px !important; /* Espacio para el botón */
+    padding-right: 45px !important;
+    /* Espacio para el botón */
     box-sizing: border-box;
 }
 
 .close-modal-editar {
-    background: none; border: none;
-    color: white; font-size: 2rem; cursor: pointer;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
 }
-

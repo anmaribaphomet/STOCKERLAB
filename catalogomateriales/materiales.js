@@ -1,228 +1,68 @@
 // Inicializar iconos de Lucide al cargar el DOM
 document.addEventListener('DOMContentLoaded', () => {
-    cargarMangas();
-    configurarBotonAdd();
+    obtenerIdLab();
+    configurarBotonAdd();//cargar el boton para agregar material
     lucide.createIcons();
+    cargarMaterial();
 });
-
-
+/*SECCION DE LA NAVEGACION DE LA PAGINA */
+/*SECCION DE LOS PROCESOS DE LA PAGINA */
 // Configurar el botón de "Agregar" para abrir el modal
 function configurarBotonAdd() {
-    const modal = document.getElementById('modal-crear-manga');
+    const modal = document.getElementById('modal-crear-material');
 
     // En lugar de escuchar al botón, escuchamos al contenedor (que nunca desaparece)
-    document.getElementById('mangas-container').addEventListener('click', (e) => {
+    document.getElementById('material-container').addEventListener('click', (e) => {
         // Buscamos si lo que se clickeó es la card-add o algo dentro de ella
         const btnAdd = e.target.closest('#btn-abrir-modal-add');
 
         if (btnAdd) {
             console.log("Abriendo modal...");
             modal.style.display = 'flex';
-            cargarEditorialescrear();
         }
     });
 }
 
 //------------------------ FUNCIONES PRINCIPALES ----------------------
-// Función para cargar mangas desde la API y mostrarlos en el DOM
-async function cargarMangas() {
-    try {
-        // Llamada al endpoint que ya incluye el LEFT JOIN con manga_imagenes
-        const response = await fetch('http://127.0.0.1:5000/mangas');
-        const mangas = await response.json();
+/*Esta funcion debe obtener del id del laboratorio que se encuentra logeado actualmente*/
+// --- 0. FUNCIÓN DE CONTROL DE SESIÓN ---
+// Aseguramos el uso de la función síncrona que frena cualquier acción sin sesión
+function obtenerIdLab() {
+    // IMPORTANTE: Asegúrate de usar el mismo nombre de llave en todo tu proyecto ("idLaboratorio")
+    const idLab = sessionStorage.getItem("idLaboratorio");
 
-        const container = document.getElementById('mangas-container');
-
-        // Mantenemos solo el botón de "Agregar" y limpiamos el resto
-        const btnAddHtml = `
-            <div class="card-add" id="btn-abrir-modal-add">
-                <div class="inner-add" style="width: 190px; height: 235px; display: flex; align-items: center; justify-content: center; margin-top: 1px;">
-                    <i data-lucide="book-plus" style=" width: 50px; height: 50px; color: #acb0be;"></i>
-                </div>
-                <span style="margin-top: 10px; font-weight: bold;">Agregar</span>
-            </div>
-        `;
-        container.innerHTML = btnAddHtml;
-
-        // Generar las tarjetas dinámicamente
-        mangas.forEach(m => {
-            const card = document.createElement('div');
-            card.className = 'manga-card';
-
-            //si la BD no tiene url_imagen, usa una por defecto
-            const rutaPortada = m.url_imagen ? m.url_imagen : 'img/default.png';
-
-
-            // Construir el HTML de la tarjeta con los datos del manga
-            card.innerHTML = `
-                <div class="card-top">
-                    <span class="id-badge">${m.id}</span>   
-                    <span class="editorial-label">Editorial ${m.id_editorial}</span>
-                    <img src="../catalogomangas/${rutaPortada}" 
-                         class="manga-img" 
-                         alt="Portada de ${m.titulo}"
-                         onerror="this.src='img/default.png'">
-                    <span class="stock-label"> <i data-lucide="package"></i> ${m.stock} Disponible/s  </span>
-
-                    <button class="btn-edit-card" onclick="montareditarManga(${m.id},event)">
-                        <i data-lucide="pencil"></i>
-                    </button>
-                    <button class="btn-delete-card"onclick="eliminarManga(${m.id})">
-                        <i data-lucide="trash-2"></i>
-                    </button>
-                </div>
-                <div class="manga-info">
-                    <h3>${m.titulo} Vol ${m.volumen}</h3>
-                    <p>${m.autor}</p>
-                    <div class="price-tag">
-                        <i data-lucide="dollar-sign"></i>
-                        <span>$${m.precio.toFixed(2)}</span>
-                    </div>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-
-        // Refrescar iconos para las nuevas tarjetas inyectadas
-        lucide.createIcons();
-
-    } catch (error) {
-        console.error("Error al conectar con la API de MangaStore:", error);
+    if (!idLab) {
+        console.error("No se encontró una sesión activa de laboratorio.");
+        window.location.href = "../login.html";
+        throw new Error("Sesión inválida: Redirigiendo al login.");
     }
+    return idLab;
 }
 
-//-------------------NAVEGACIÓN-------------------
-const btnInicio = document.getElementById('pp-nav');
-btnInicio.addEventListener('click', () => {
-    // Salimos de /catalogomangas/ y entramos a /pp/
-    window.location.href = '../pp/pp.html';
-});
-const btnEditorial = document.getElementById('btn-nav-editorial')
-btnEditorial.addEventListener('click', () => {
-    // Salimos de /catalogomangas/ y entramos a /pp/
-    window.location.href = '../editorial/editorial.html';
-});
-const btnVenta = document.getElementById('btn-nav-ventas')
-btnVenta.addEventListener('click', () => {
-    // Salimos de /catalogomangas/ y entramos a /pp/
-    window.location.href = '../historialVentas/ventas.html';
-});
 
-//-------------------BUSCADOR-------------------
-
-//Buscar Manga por Nombre, Autor o ID (GET a la API)
-const btnBuscarManga = document.getElementById('btn-search-manga')
-btnBuscarManga.addEventListener('click', () => {
-    buscarManga();
-});
-async function buscarManga() {
-    const tipoFiltro = document.getElementById('tipo-filtro').value;
-    const valor = document.getElementById('input-busqueda').value.trim();
-    const container = document.getElementById('mangas-container');
-
-    if (valor === "") {
-        cargarMangas();
-        return;
-    }
-
-    // Construir la URL correcta según tu API
-    let url = "";
-    if (tipoFiltro === 'id') {
-        url = `http://127.0.0.1:5000/mangas/${valor}`;
-    } else if (tipoFiltro === 'nombre') {
-        url = `http://127.0.0.1:5000/mangas/nombre/${valor}`;
-    } else if (tipoFiltro === 'autor') {
-        url = `http://127.0.0.1:5000/mangas/autor/${valor}`;
-    }
-        console.log("Buscando en:", url);
+async function obtenerNombreLab() {
+    const idLaboratorioActual = obtenerIdLab();
     try {
-        const respuesta = await fetch(url);
-        container.innerHTML = ""; // Limpiamos siempre antes de procesar
+        const response = await fetch(`http://127.0.0.1:5000/api/laboratorios/${idLaboratorioActual}`);
+        const laboratorio = await response.json();
 
-        if (respuesta.ok) {
-            let datos = await respuesta.json();
-
-            const mangas = Array.isArray(datos) ? datos : [datos];
-
-            if (mangas.length > 0 && mangas[0] !== null) {
-                mangas.forEach(m => {
-                    // Validamos que el objeto tenga datos (por si el API manda [null])
-                    if(!m.id) return; 
-
-                    const card = document.createElement('div');
-                    card.className = 'manga-card';
-                    card.innerHTML = `
-                        <div class="card-top">
-                            <span class="id-badge">${m.id}</span>   
-                            <span class="editorial-label">Editorial ${m.id_editorial}</span>
-                            <img src="${m.url_imagen || 'img/default.png'}" 
-                                 class="manga-img" 
-                                 alt="Portada de ${m.titulo}"
-                                 onerror="this.src='img/default.png'">
-                            <span class="stock-label"> <i data-lucide="package"></i> ${m.stock} Disponible/s </span>
-
-                            <button class="btn-edit-card" onclick="montareditarManga(${m.id}, event)">
-                                <i data-lucide="pencil"></i>
-                            </button>
-                            <button class="btn-delete-card" onclick="eliminarManga(${m.id})">
-                                <i data-lucide="trash-2"></i>
-                            </button>
-                        </div>
-                        <div class="manga-info">
-                            <h3>${m.titulo} Vol ${m.volumen}</h3>
-                            <p>${m.autor}</p>
-                            <div class="price-tag">
-                                <i data-lucide="dollar-sign"></i>
-                                <span>$${m.precio.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-
-                // Renderizar iconos
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
-            } else {
-                container.innerHTML = `<p class="no-results">No se encontraron resultados para "${valor}"</p>`;
-            }
+        if (response.ok) {
+            return laboratorio;
         } else {
-            container.innerHTML = `<p class="no-results">No se encontraron resultados para "${valor}"</p>`;
+            console.error("Error en la respuesta de la API:", laboratorio.mensaje);
+            return null;
         }
     } catch (error) {
-        console.error("Error al buscar:", error);
-        Swal.fire('Error', 'No se pudo realizar la búsqueda', 'error');
+        console.error("Error cargando Laboratorio", error);
     }
 }
+
+/* Funcion para agregar los materiales */
 
 //--------------------------MODAL DE CREAR--------------------------
-//  Cargar Editoriales desde  API
-async function cargarEditorialescrear() {
-    try {
-        const response = await fetch('http://127.0.0.1:5000/editoriales');
-        const editoriales = await response.json();
-        const select = document.getElementById('select-editorial');
 
-        select.innerHTML = editoriales.map(e =>
-            `<option value="${e.id}">${e.nombre}</option>`
-        ).join('');
-    } catch (error) {
-        console.error("Error cargando editoriales", error);
-    }
-}
-
-// Probar Imagen (El botón del taladro) para nuevo manga
-document.getElementById('btn-probar-img').addEventListener('click', () => {
-    const url = document.getElementById('nuevo-url-img').value;
-    const preview = document.getElementById('nuevo-manga-preview');
-    if (url) {
-        preview.innerHTML = `<img src="../catalogomangas/${url}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`;
-    }
-});
-
-// Guardar Manga (POST a la API)
-const modal = document.getElementById("modal-crear-manga");
+// Guardar MATERIAL (POST a la API)
+const modal = document.getElementById("modal-crear-material");
 const btnCerrar = document.querySelector(".close-modal-crear");
 btnCerrar.addEventListener("click", () => {
     modal.style.display = "none";
@@ -240,290 +80,461 @@ btnCerrarEditar.addEventListener("click", () => {
     modalEditar.style.display = "none";
 });
 // Cerrar modal si se hace click fuera de la ventana blanca
-const modalEditar = document.getElementById("modal-editar-manga");
+const modalEditar = document.getElementById("modal-editar-material");
 window.addEventListener("click", (event) => {
     if (event.target == modalEditar) {
         modalEditar.style.display = "none";
     }
 });
 
-//no permitir que volumen, precio o stock sean negativos
-document.getElementById('nuevo-volumen').addEventListener('input', (e) => {
-    if (e.target.value <= 0) e.target.value = 1;
-});
-document.getElementById('nuevo-precio').addEventListener('input', (e) => {
-    if (e.target.value < 0) e.target.value = 0;
-});
-document.getElementById('nuevo-stock').addEventListener('input', (e) => {
+//no permitir que cantidad sea negativa
+document.getElementById('cantidad-material').addEventListener('input', (e) => {
     if (e.target.value <= 0) e.target.value = 1;
 });
 
-//mostrar imagen al dar click en el  ojo del modal
-document.getElementById('btn-probar-img').addEventListener('click', () => {
-    const url = document.getElementById('nuevo-url-img').value;
-    const preview = document.getElementById('nuevo-manga-preview');
-    preview.innerHTML = `<img src="../catalogomangas/${url}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`;
-});
 
 // Enviar a la base de datos al dar click en "Guardar" la informacion que hay en los inputs del modal
-//METODO DE CREAR MANGA (POST)
+//METODO DE CREAR MANTERIAL (POST)
 document.getElementById('btn-confirmar-guardar').addEventListener('click', async () => {
-    const mangaData = {
-        titulo: document.getElementById('nombreCrear').value,
-        autor: document.getElementById('nuevo-autor').value,
-        volumen: parseFloat(document.getElementById('nuevo-volumen').value),
-        precio: parseFloat(document.getElementById('nuevo-precio').value),
-        stock: parseInt(document.getElementById('nuevo-stock').value),
-        id_editorial: parseInt(document.getElementById('select-editorial').value)
-    };
-
     try {
-        const response = await fetch('http://127.0.0.1:5000/mangas', {
+        // 1. Obtener el ID del laboratorio activo desde el selector global
+        const idLaboratorioActivo = obtenerIdLab();
+
+        // 2. Capturar los campos de texto del material
+        const nombreInput = document.getElementById('nombreCrear');
+        const cantidadInput = document.getElementById('cantidad-material');
+        const urlInput = document.getElementById('editar-url-img'); // Input de texto de la URL
+
+        const nombre = nombreInput ? nombreInput.value.trim() : "";
+        const cantidad = cantidadInput ? parseInt(cantidadInput.value) : 1;
+        const urlTexto = urlInput ? urlInput.value.trim() : "";
+
+        // 3. Capturar el archivo físico del uploader de archivos
+        const fileInput = document.getElementById('file-uploader-editar');
+        const archivoFisico = fileInput ? fileInput.files[0] : null;
+
+        // Validación veloz de seguridad en el front
+        if (!nombre) {
+            Swal.fire('Atención', 'El nombre del material es obligatorio.', 'warning');
+            return;
+        }
+
+        // 4. Construir el FormData empacando todo para Multipart
+        const formData = new FormData();
+        formData.append('nombre', nombre);
+        formData.append('cantidad', cantidad);
+        formData.append('id_lab', idLaboratorioActivo);
+
+        // Si hay archivo físico lo mandamos prioritariamente; si no, mandamos la URL de texto
+        if (archivoFisico) {
+            formData.append('imagen', archivoFisico); // El backend lo recibirá y renombrará con el valor de 'nombre'
+        } else if (urlTexto && !urlTexto.startsWith('[Archivo Local]')) {
+            formData.append('url_texto', urlTexto);
+        }
+
+        // 5. Enviar la petición única al servidor Flask
+        const response = await fetch('http://127.0.0.1:5000/api/materiales', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(mangaData)
+            body: formData  // Al usar FormData, el navegador asigna el Content-Type correcto automáticamente
         });
 
         const result = await response.json();
 
         if (response.ok) {
-            // Mostrar el ID que devolvió la BD
-            console.log("ID del manga creado:", result.id);
-            const urlImg = document.getElementById('nuevo-url-img').value;
-            if (urlImg) {
-                await fetch('http://127.0.0.1:5000/mangas/imagenes', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ manga_id: result.id, url_imagen: urlImg })
-                });
-            }
+            // Obtener el nombre semántico de la categoría para el SweetAlert
+            const infoLab = await obtenerNombreLab();
+            const categoria = infoLab ? infoLab.categoria : 'Inventario';
 
             await Swal.fire({
-                title: '¡Manga Agregado!',
-                text: 'El registro se guardó correctamente',
+                title: '¡Material Agregado!',
+                text: `El registro se asoció correctamente al laboratorio de ${categoria}`,
                 icon: 'success',
-                width: '280px',
+                width: '300px',
                 confirmButtonText: 'ok',
                 confirmButtonColor: '#b189d7'
             });
-            // Reemplaza 'modalCrear' por el ID real del modal
-            const modalElement = document.getElementById('modalCrear');
+
+            // 6. Limpieza profunda y estética del formulario tras guardar con éxito
+            if (nombreInput) nombreInput.value = "";
+            if (cantidadInput) cantidadInput.value = "1";
+            if (urlInput) urlInput.value = "";
+            if (fileInput) fileInput.value = ""; // Resetea el file uploader de raíz
+
+            const previewBox = document.getElementById('editar-material-preview');
+            const previewPlaceholder = document.getElementById('preview-placeholder');
+            if (previewBox) previewBox.style.backgroundImage = 'none';
+            if (previewPlaceholder) previewPlaceholder.style.display = 'flex';
+
+            // 7. Cerrar el modal limpiamente removiendo estilos o displays
+            const modalElement = document.getElementById('modal-crear-material');
             if (modalElement) {
-                const modalBootstrap = bootstrap.Modal.getInstance(modalElement);
-                if (modalBootstrap) {
-                    modalBootstrap.hide();
-                }
+                modalElement.style.display = 'none'; // Cierre consistente
+                modalElement.classList.remove('active');
             }
 
-            // Recargar la página para ver los cambios
-            location.reload();
+            // 8. Actualizar las tarjetas del frontend reactivamente en lugar de recargar la pestaña entera
+            if (typeof cargarMaterial === 'function') {
+                cargarMaterial();
+            }
 
         } else {
-            alert("Error: " + result.error);
+            Swal.fire('Error del servidor', result.error || 'No se pudo guardar el registro', 'error');
         }
     } catch (error) {
-        console.error("Error al guardar:", error);
+        console.error("Proceso de guardado interrumpido:", error.message);
+        Swal.fire('Error', 'No se pudo conectar con el servidor backend', 'error');
+    }
+});
+/*Funcion para cargar materiales */
+
+// Captura de elementos
+const previewBox = document.getElementById('editar-material-preview');
+const fileUploader = document.getElementById('file-uploader-editar');
+const urlInput = document.getElementById('editar-url-img');
+const previewPlaceholder = document.getElementById('preview-placeholder');
+
+// --- FLUJO 1: CARGAR ARCHIVO LOCAL ---
+
+// 1. Al hacer clic en la preview-box, simulamos el clic en el input file
+previewBox.addEventListener('click', (e) => {
+    // Evitamos que se dispare si se hace clic en el texto del ID por accidente
+    if (e.target.id !== 'display-edit-id') {
+        fileUploader.click();
     }
 });
 
-//--------------------------MODAL DE EDITAR--------------------------
-//para editar manga, el botón del taladro del modal editar
-document.getElementById('btn-probar-img-editar').addEventListener('click', () => {
-    const url = document.getElementById('editar-url-img').value;
-    const preview = document.getElementById('editar-manga-preview');
-    if (url) {
-        preview.innerHTML = `<img src="../catalogomangas/${url}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">`;
+// 2. Escuchar cuando se selecciona una imagen del dispositivo
+fileUploader.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const base64Image = e.target.result;
+
+            // Renderizamos la imagen como fondo de la preview-box
+            previewBox.style.backgroundImage = `url('${base64Image}')`;
+
+            // Ocultamos el icono de Lucide para que no estorbe la vista previa
+            previewPlaceholder.style.display = 'none';
+
+            // Opcional: Colocamos un texto indicativo o el nombre del archivo en el input de texto
+            urlInput.value = `[Archivo Local] ${file.name}`;
+        };
+
+        reader.readAsDataURL(file);
     }
 });
-// Función para abrir modal editar
-async function montareditarManga(id, event) {
-    if (event) event.stopPropagation(); // Detener la propagación del evento
-    console.log("Editando manga lolo con ID:", id);
-    const modal = document.getElementById('modal-editar-manga');
 
+async function cargarMaterial() {
     try {
-        // Mostrar el modal y cargar las editoriales primero
-        modal.style.display = 'flex';
-        await cargarEditorialeseditar();
+        const idActual = obtenerIdLab();
+        const response = await fetch(`http://127.0.0.1:5000/api/materiales/laboratorio/${idActual}`);
+        const materiales = await response.json();
+        const { categoria } = (await obtenerNombreLab()) || { categoria: 'Inventario' };
 
-        // Consultar los datos del manga específico
-        const response = await fetch(`http://127.0.0.1:5000/mangas/${id}`);
-        const manga = await response.json();
-
-        if (response.ok) {
-            // Rellenar los campos del modal con los datos de la DB
-            document.getElementById('nombreEditar').value = manga.titulo;
-            document.getElementById('editar-autor').value = manga.autor;
-            document.getElementById('editar-volumen').value = manga.volumen;
-            document.getElementById('editar-precio').value = manga.precio;
-            document.getElementById('editar-stock').value = manga.stock;
-            document.getElementById('editar-url-img').value = manga.url_imagen || "";
-            const btnProbar = document.getElementById('btn-probar-img-editar');
-            if (btnProbar) {
-                btnProbar.click(); // Esto simula que el usuario le picó al ojo xd
-            }
-   
-            const selectEdit = document.getElementById('select-editorial-editar');
-            const nombreBusca = manga.id_editorial; // Aquí viene el nombre desde Python
-
-            if (selectEdit && nombreBusca) {
-                // Recorremos las opciones para encontrar la que coincida con el nombre
-                for (let i = 0; i < selectEdit.options.length; i++) {
-                    // .trim() elimina espacios accidentales al inicio o final
-                    if (selectEdit.options[i].text.trim() === nombreBusca.trim()) {
-                        selectEdit.selectedIndex = i;
-                        break;
-                    }
-                }
-            }
-            // Guardamos el ID en un lugar oculto para saber que estamos EDITANDO y no CREANDO
-            const inputId = document.getElementById('edit-manga-id');
-            if (inputId) inputId.value = id;
-
+        // CORRECCIÓN PREVENTIVA: Si Flask responde un error (objeto), evitamos el colapso del forEach
+        if (!Array.isArray(materiales)) {
+            console.error("Error desde el servidor Flask:", materiales.error);
+            return;
         }
-    } catch (error) {
-        console.error("Error en la carga:", error);
-    }
-}
 
-// Función para eliminar un manga (con confirmación)
-async function eliminarManga(id) {
-    const result = await Swal.fire({
-        title: 'Seguro que quieres eliminar este manga?',
-        text: 'Esta acción no se puede deshacer',
-        icon: 'warning',
-        width: '280px',
-        showCancelButton: true,
-        cancelButtonText: 'Cancelar',
-        cancelButtonColor: '#b189d7',
-        confirmButtonText: 'Sí, eliminar',
-        confirmButtonColor: '#b189d7'
-    });
-    if (result.isConfirmed) {
-        try {
-            const response = await fetch(`http://127.0.0.1:5000/mangas/${id}`, {
-                method: 'DELETE'
-            });
+        const container = document.getElementById('material-container');
+        if (!container) return; // Protección por si no encuentra el contenedor
 
-            if (response.ok) {
-                await Swal.fire({
-                    title: '¡Manga Eliminado!',
-                    text: 'El registro se eliminó correctamente',
-                    icon: 'success',
-                    width: '280px',
-                    confirmButtonText: 'ok',
-                    confirmButtonColor: '#b189d7'
-                });
-                location.reload();
-            } else {
-                alert("Error al eliminar el manga");
-            }
-        } catch (error) {
-            console.error("Error al eliminar:", error);
-        }
-    } else {
-        await Swal.fire({
-            title: '¡Cancelado!',
-            text: 'El manga no fue eliminado',
-            icon: 'error',
-            width: '280px',
-            confirmButtonText: 'ok',
-            confirmButtonColor: '#b189d7'
+        const btnAddHtml = `
+            <div class="card-add" id="btn-abrir-modal-add">
+                <div class="inner-add" style="width: 190px; height: 235px; display: flex; align-items: center; justify-content: center; margin-top: 1px;">
+                    <i data-lucide="book-plus" style="width: 50px; height: 50px; color: #acb0be;"></i>
+                </div>
+                <span style="margin-top: 10px; font-weight: bold;">Agregar</span>
+            </div>
+        `;
+        container.innerHTML = btnAddHtml;
+
+        materiales.forEach(m => {
+            const card = document.createElement('div');
+            card.className = 'material-card';
+
+            const rutaPortada = m.Ruta_Imagen ? m.Ruta_Imagen : 'static/uploads/default.png';
+
+            card.innerHTML = `
+                <div class="card-top">
+                    <span class="id-badge">ID: ${m.IdMaterial}</span>   
+                    
+                    <img src="../${rutaPortada}" 
+                         class="material-img" 
+                         alt="Imagen de ${m.Nombre_Material}"
+                         onerror="this.src='img/default.png'">
+                    
+                    <span class="stock-label"> 
+                        <i data-lucide="package"></i> ${m.Cantidad} Disponible/s
+                    </span>
+                </div>
+
+                <button class="btn-edit-card" onclick="montareditarMaterial(${m.IdMaterial}, event)">
+                        <i data-lucide="pencil"></i>
+                </button>
+                <button class="btn-delete-card" onclick="eliminarMaterial(${m.IdMaterial})">
+                    <i data-lucide="trash-2"></i>
+                </button>
+                
+                <div class="material-info">
+                    <h3>${m.Nombre_Material}</h3>
+                    <p>Laboratorio de ${categoria}</p>
+                    <p style="color: #6c757d; font-size: 14px; margin-top: 5px;">
+                        Cantidad total: <strong>${m.Cantidad}</strong> u.
+                    </p>
+                </div>
+            `;
+            container.appendChild(card);
         });
-    }
 
+        lucide.createIcons();
 
-}
-// Función para cargar editoriales en el select del modal editar
-async function cargarEditorialeseditar() {
-    try {
-        const response = await fetch('http://127.0.0.1:5000/editoriales');
-        const editoriales = await response.json();
-        const select = document.getElementById('select-editorial-editar');
-
-        select.innerHTML = editoriales.map(e =>
-            `<option value="${e.id}">${e.nombre}</option>`
-        ).join('');
     } catch (error) {
-        console.error("Error cargando editoriales", error);
+        console.error("Error al conectar con la API de Stocker Lab:", error);
     }
 }
 
-// Función para confirmar edición (PUT a la API)
-document.getElementById('btn-confirmar-editar').addEventListener('click', async () => {
-    const mangaId = document.getElementById('edit-manga-id').value;
-    const urlImg = document.getElementById('editar-url-img').value; // Definimos la variable urlImg
 
-    if (!mangaId) {
-        Swal.fire('Error', 'No se encontró el ID', 'error');
+/* ==========================================
+   ACTUALIZAR MATERIALES (Stocker_Lab)
+   ========================================== */
+
+// 1. FUNCIÓN PARA CARGAR LOS DATOS EN EL MODAL AL HACER CLIC EN EDITAR
+async function montareditarMaterial(id, event) {
+
+    // Evitar propagación
+    if (event) {
+        event.stopPropagation();
+    }
+
+    console.log("Editando material en Stocker_Lab con ID:", id);
+
+    // Modal
+    const modal =
+        document.getElementById('modal-editar-material');
+
+    try {
+
+        // Mostrar modal
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+
+        // ============================================
+        // FETCH
+        // ============================================
+
+        const response = await fetch(
+            `http://127.0.0.1:5000/api/materiales/${id}`
+        );
+
+        const material = await response.json();
+
+        // ============================================
+        // VALIDAR RESPUESTA
+        // ============================================
+
+        if (response.ok && material) {
+
+            console.log("Material recibido:", material);
+
+            // ============================================
+            // CAMPOS
+            // ============================================
+
+            // Nombre
+            document.getElementById('nombreEditar').value =
+                material.Nombre_Material || "";
+
+            // Cantidad
+            document.getElementById('editar-cantidad').value =
+                material.Cantidad || 0;
+
+            // ============================================
+            // INPUT IMAGEN
+            // ============================================
+
+            const inputImg =
+                document.getElementById('editar-url-img');
+
+            if (inputImg) {
+
+                // Mostrar solo nombre archivo
+                const nombreArchivo =
+                    material.Ruta_Imagen
+                        ? material.Ruta_Imagen.split('/').pop()
+                        : "";
+
+                inputImg.value = nombreArchivo;
+
+            }
+
+            // ============================================
+            // PREVIEW IMAGEN
+            // ============================================
+
+            const preview =
+                document.getElementById('preview-placeholder');
+
+            if (preview) {
+
+                // Si existe imagen
+                if (material.Ruta_Imagen) {
+
+                    // Ruta correcta
+                    const rutaImagen =
+                        `http://127.0.0.1:5000/${material.Ruta_Imagen}`;
+
+                    console.log(rutaImagen);
+
+                    preview.innerHTML = `
+                        <img 
+                            src="${rutaImagen}"
+                            style="
+                                width:100%;
+                                height:100%;
+                                object-fit:cover;
+                                border-radius:20px;
+                            "
+                        >
+                    `;
+
+                }
+
+                // Si no hay imagen
+                else {
+
+                    preview.innerHTML = `
+                        <i 
+                            data-lucide="image"
+                            style="height: 50px; width: 50px;"
+                        ></i>
+                    `;
+
+                }
+
+            }
+            // ============================================
+            // ID VISUAL
+            // ============================================
+
+            const txtDisplayId =
+                document.getElementById('display-edit-id');
+
+            if (txtDisplayId) {
+
+                txtDisplayId.textContent =
+                    `id: ${id}`;
+
+            }
+
+            // ============================================
+            // INPUT HIDDEN
+            // ============================================
+
+            const inputId =
+                document.getElementById('edit-material-id');
+
+            if (inputId) {
+
+                inputId.value = id;
+
+            }
+
+        }
+
+        // ============================================
+        // ERROR RESPUESTA
+        // ============================================
+
+        else {
+
+            console.error(
+                "No se pudieron obtener datos válidos:",
+                material
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Error al cargar los datos del material:",
+            error
+        );
+
+    }
+
+}
+
+// 2. EVENTO PARA CONFIRMAR LA EDICIÓN (Petición PUT Unificada)
+document.getElementById('btn-confirmar-editar').addEventListener('click', async () => {
+    // Recuperar el ID del material guardado en el input hidden
+    const materialId = document.getElementById('edit-material-id').value;
+    const inputUrlImg = document.getElementById('editar-url-img');
+    const urlImg = inputUrlImg ? inputUrlImg.value.trim() : "";
+
+    if (!materialId) {
+        Swal.fire('Error', 'No se encontró el ID del material a actualizar', 'error');
         return;
     }
 
-    const mangaData = {
-        titulo: document.getElementById('nombreEditar').value,
-        autor: document.getElementById('editar-autor').value,
-        volumen: parseFloat(document.getElementById('editar-volumen').value),
-        precio: parseFloat(document.getElementById('editar-precio').value),
-        stock: parseInt(document.getElementById('editar-stock').value),
-        id_editorial: parseInt(document.getElementById('select-editorial-editar').value)
+    // Capturar y limpiar los valores actuales del formulario
+    const nombreMaterial = document.getElementById('nombreEditar').value.trim();
+    const cantidadMaterial = parseInt(document.getElementById('editar-volumen').value) || 0;
+
+    // Validación veloz en el Frontend
+    if (!nombreMaterial) {
+        Swal.fire('Atención', 'El campo Nombre es obligatorio', 'warning');
+        return;
+    }
+
+    // Armamos el JSON mapeando los datos a las propiedades PascalCase que espera la DB a través de Flask
+    const materialData = {
+        Nombre_Material: nombreMaterial,
+        Cantidad: cantidadMaterial,
+        Ruta_Imagen: urlImg,
+        IdLaboratorio: obtenerIdLab() // Mantiene la segmentación multi-tenant del laboratorio activo
     };
 
     try {
-        //Actualizar datos generales del Manga
-        let resManga = await fetch(`http://127.0.0.1:5000/mangas/${mangaId}`, {
+        // Al vivir todo en la misma tabla, un solo PUT actualiza datos e imagen de un solo golpe
+        let response = await fetch(`http://127.0.0.1:5000/api/materiales/${materialId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(mangaData)
+            body: JSON.stringify(materialData)
         });
 
-        if (resManga.ok) {
-            // Verificar si la imagen ya existe en la DB
-            // Hacemos un GET simple.
-            let resVerificar = await fetch(`http://127.0.0.1:5000/mangas/imagenes/${mangaId}`);
-            
-            let resImg;
+        if (response.ok) {
+            await Swal.fire({
+                title: '¡Actualizado!',
+                text: 'El material se actualizó con éxito',
+                icon: 'success',
+                confirmButtonColor: '#b189d7'
+            });
 
-            if (resVerificar.ok) {
-                // Si el GET fue exitoso (200), la imagen EXISTE -> Usamos PUT
-                console.log("La imagen existe, actualizando...");
-                resImg = await fetch(`http://127.0.0.1:5000/mangas/imagenes/${mangaId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url_imagen: urlImg })
-                });
-            } else if (resVerificar.status === 404) {
-                // Si el GET devolvió 404, la imagen NO EXISTE -> Usamos POST
-                console.log("La imagen no existe, creando nuevo registro...");
-                resImg = await fetch(`http://127.0.0.1:5000/mangas/imagenes`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        manga_id: parseInt(mangaId), 
-                        url_imagen: urlImg 
-                    })
-                });
-            }
+            // Cerrar el modal limpiamente restableciendo su display
+            const modal = document.getElementById('modal-editar-material');
+            if (modal) modal.style.display = 'none';
 
-            // Verificar resultado final de la operación de imagen
-            if (resImg && resImg.ok) {
-                await Swal.fire({
-                    title: '¡Actualizado!',
-                    text: 'Manga e imagen procesados con éxito',
-                    icon: 'success',
-                    confirmButtonColor: '#b189d7'
-                });
-                location.reload();
-            } else {
-                Swal.fire('Atención', 'Se actualizó el manga, pero hubo un problema con la imagen', 'warning');
+            // Refrescar el grid de tarjetas reactivamente sin recargar la pestaña entera
+            if (typeof cargarMaterial === 'function') {
+                cargarMaterial();
             }
         } else {
-            Swal.fire('Error', 'No se pudieron actualizar los datos del manga', 'error');
+            const errorData = await response.json();
+            Swal.fire('Error', errorData.error || 'No se pudieron guardar los cambios en el servidor', 'error');
         }
     } catch (error) {
-        console.error("Error global:", error);
-        Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
+        console.error("Error global al intentar guardar la edición:", error);
+        Swal.fire('Error', 'No se pudo conectar con el servidor de Flask', 'error');
     }
 });
 
+/*ELIMINAR MATERIAL */
 
 
