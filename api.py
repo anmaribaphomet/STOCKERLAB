@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, request
 import pyodbc
-
+from flask_cors import CORS 
 app = Flask(__name__)
+CORS(app)
 
 # Función central para conectar a la base de datos
 def get_db_connection():
@@ -365,7 +366,7 @@ def obtener_bitacora_incidencias_por_laboratorio(id_lab):
          "id_bitacora": fila[0],
          "id_material": fila[1],
          "nombre_material": fila[2],
-         "tipo": fila[3],
+         "tipo": "Entrada" if fila[3] else "Salida",
          "cantidad": fila[4],
          "descripcion": fila[5],
          "fecha": fila[6].isoformat() if fila[6] else None,  # Convertimos a formato ISO para JSON
@@ -382,15 +383,167 @@ def obtener_bitacora_incidencias_por_laboratorio(id_lab):
         return jsonify({"error": str(e)}), 500
     
 #OBTENER BITACORA DE INCIDENCIA POR ID DE INCIDENCIA
-#OBTENER BITACORA DE INCIDENCIA POR ID DE PROFESOR
-#OBTENER BITACORA DE INCIDENCIA POR ID DE ALUMNO
+@app.route('/api/bitacora/incidencias/laboratorio/<int:id_lab>/<int:id_inc>', methods=['GET'])
+def obtener_bitacora_incidencias_por_incidencia(id_lab, id_inc):   
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Buscamos los registros de la bitácora específicos por su ID de laboratorio
+        query = """
+            SELECT 
+        b.Id_bit_inc, 
+        b.IdMaterial, 
+        m.Nombre_Material, 
+        b.Tipo,
+        b.Cantidad, 
+        b.Descripcion,
+        b.Fecha,
+        b.Exp_Maestro,
+        b.Exp_Alumno
+      FROM bitacora_incidencia b
+      JOIN material m ON b.IdMaterial = m.IdMaterial
+       WHERE b.IdLaboratorio = ? AND b.Id_bit_inc = ?
+       ORDER BY b.Fecha DESC
+        """
+        cursor.execute(query, (id_lab, id_inc))
+        filas = cursor.fetchall()
 
+        bitacora = []
+        for fila in filas:
+         bitacora.append({
+         "id_bitacora": fila[0],
+         "id_material": fila[1],
+         "nombre_material": fila[2],
+         "tipo": "Entrada" if fila[3] else "Salida",
+         "cantidad": fila[4],
+         "descripcion": fila[5],
+         "fecha": fila[6].isoformat() if fila[6] else None,  # Convertimos a formato ISO para JSON
+         "exp_maestro": fila[7],  # Añadimos el campo de experiencia del maestro
+         "exp_alumno": fila[8]  # Añadimos el campo de experiencia del alumno
+       })
+        
+        conn.close()
+        return jsonify(bitacora), 200
+
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+#OBTENER BITACORA DE INCIDENCIA POR ID DE PROFESOR
+@app.route('/api/bitacora/incidencias/laboratorio/<int:id_lab>/maestro/<int:exp_maestro>', methods=['GET'])
+def obtener_incidencias_por_maestro(id_lab, exp_maestro):   
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        query = """
+            SELECT 
+                b.Id_bit_inc, b.IdMaterial, m.Nombre_Material, b.Tipo,
+                b.Cantidad, b.Descripcion, b.Fecha, b.Exp_Maestro, b.Exp_Alumno
+            FROM bitacora_incidencia b
+            JOIN material m ON b.IdMaterial = m.IdMaterial
+            WHERE b.IdLaboratorio = ? AND b.Exp_Maestro = ?
+            ORDER BY b.Fecha DESC
+        """
+        # Pasamos ambos parámetros a la consulta
+        cursor.execute(query, (id_lab, exp_maestro))
+        filas = cursor.fetchall()
+
+        bitacora = []
+        for fila in filas:
+            bitacora.append({
+                "id_bitacora": fila[0],
+                "id_material": fila[1],
+                "nombre_material": fila[2],
+                "tipo": "Entrada" if fila[3] else "Salida",
+                "cantidad": fila[4],
+                "descripcion": fila[5],
+                "fecha": fila[6].isoformat() if fila[6] else None,
+                "exp_maestro": fila[7],
+                "exp_alumno": fila[8]
+            })
+        
+        conn.close()
+        return jsonify(bitacora), 200
+
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+#OBTENER BITACORA DE INCIDENCIA POR ID DE ALUMNO
+@app.route('/api/bitacora/incidencias/laboratorio/<int:id_lab>/alumno/<int:exp_alumno>', methods=['GET'])
+def obtener_incidencias_por_alumno(id_lab, exp_alumno):   
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        query = """
+            SELECT 
+                b.Id_bit_inc, b.IdMaterial, m.Nombre_Material, b.Tipo,
+                b.Cantidad, b.Descripcion, b.Fecha, b.Exp_Maestro, b.Exp_Alumno
+            FROM bitacora_incidencia b
+            JOIN material m ON b.IdMaterial = m.IdMaterial
+            WHERE b.IdLaboratorio = ? AND b.Exp_Alumno = ?
+            ORDER BY b.Fecha DESC
+        """
+        # Pasamos ambos parámetros a la consulta
+        cursor.execute(query, (id_lab, exp_alumno))
+        filas = cursor.fetchall()
+
+        bitacora = []
+        for fila in filas:
+            bitacora.append({
+                "id_bitacora": fila[0],
+                "id_material": fila[1],
+                "nombre_material": fila[2],
+                "tipo": "Entrada" if fila[3] else "Salida",
+                "cantidad": fila[4],
+                "descripcion": fila[5],
+                "fecha": fila[6].isoformat() if fila[6] else None,
+                "exp_maestro": fila[7],
+                "exp_alumno": fila[8]
+            })
+        
+        conn.close()
+        return jsonify(bitacora), 200
+
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return jsonify({"error": str(e)}), 500
 #AGREGAR NUEVA INCIDENCIA 
 
 #ACTUALIZAR BITACORA DE INCIDENCIA
 
 #ELIMINAR UN REGISTRO DE LA BITACORA DE INCIDENCIA
+@app.route('/api/bitacora/incidencias/<int:id>', methods=['DELETE'])
+def eliminar_incidencia(id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
+        # Verificamos si la incidencia existe
+        query = "SELECT Id_bitacora FROM bitacora_incidencia WHERE Id_bitacora = ?"
+        cursor.execute(query, (id,))
+        fila = cursor.fetchone()
+
+        if not fila:
+            return jsonify({"mensaje": "No se encontro la incidencia"}), 404
+
+        # Eliminamos la incidencia
+        query = "DELETE FROM bitacora_incidencia WHERE Id_bitacora = ?"
+        cursor.execute(query, (id,))
+        conn.commit()
+
+        conn.close()
+        return jsonify({"mensaje": "Incidencia eliminada con éxito"}), 200
+
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+    
 
 if __name__ == '__main__':
     # Esto levanta el servidor en el puerto 5000
