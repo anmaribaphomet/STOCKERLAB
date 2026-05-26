@@ -1,8 +1,13 @@
+import os
+from flask import Flask, request, jsonify
+from werkzeug.utils import secure_filename
+import uuid # Para generar nombres de archivo únicos
 from flask import Flask, jsonify, request
 import pyodbc
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 # Función central para conectar a la base de datos
 def get_db_connection():
     #conexion = pyodbc.connect(
@@ -15,7 +20,8 @@ def get_db_connection():
    #conexion maria
      conexion = pyodbc.connect(
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=DESKTOP-RO62CP8\\MARILUBERSK;'
+        #'SERVER=DESKTOP-RO62CP8\\MARILUBERSK;'
+        'SERVER=localhost\\SQLEXPRESS;'
         'DATABASE=stockerlab;'
         'UID=Super_Stocker;'
         'PWD=Windows2016;'  
@@ -59,24 +65,29 @@ def obtener_material_por_id(id):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Buscamos el material específico por su ID único
-        query = "SELECT IdMaterial, Nombre_Material, Cantidad, Idlaboratorio FROM material WHERE IdMaterial = ?"
+        # CORREGIDO: Añadimos 'Ruta_Imagen' al SELECT usando los nombres exactos de tu BD
+        query = "SELECT IdMaterial, Nombre_Material, Cantidad, IdLaboratorio, Ruta_Imagen FROM material WHERE IdMaterial = ?"
         cursor.execute(query, (id,))
         fila = cursor.fetchone()
 
         if not fila:
-            return jsonify({"mensaje" : "No se encontro el material"}),400
+            cursor.close()
+            conn.close()
+            # CORREGIDO: Retornamos un 404 (Not Found) en lugar de un 400
+            return jsonify({"mensaje": "No se encontró el material"}), 404
         
+        # CORREGIDO: Estructuramos el diccionario en PascalCase para que coincida con tu JS
         material = {
-            "id": fila[0],
-            "nombre": fila[1],
-            "cantidad": fila[2],
-            "id_laboratorio": fila[3]
+            "IdMaterial": fila[0],
+            "Nombre_Material": fila[1],
+            "Cantidad": fila[2],
+            "IdLaboratorio": fila[3],
+            "Ruta_Imagen": fila[4]  # Mapeo directo de la ruta de la imagen
         }
         
+        cursor.close()
         conn.close()
         return jsonify(material), 200
-
     except Exception as e:
         conn.rollback()
         conn.close()
@@ -85,28 +96,32 @@ def obtener_material_por_id(id):
 #OBTENER MATERIALES POR ID DE LABORATORIO
 @app.route('/api/materiales/laboratorio/<int:id_lab>', methods=['GET'])
 def obtener_materiales_por_laboratorio(id_lab):
-    
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Buscamos los materiales específicos por su ID de laboratorio
-        query = "SELECT IdMaterial, Nombre_Material, Cantidad, Idlaboratorio FROM material WHERE IdLaboratorio = ?"
+        # CORREGIDO: Consulta directa a la tabla 'material' usando los nombres exactos de tu BD
+        query = """
+            SELECT IdMaterial, Nombre_Material, Cantidad, IdLaboratorio, Ruta_Imagen 
+            FROM material 
+            WHERE IdLaboratorio = ?
+        """
         cursor.execute(query, (id_lab,))
         filas = cursor.fetchall()
 
         materiales = []
         for fila in filas:
             materiales.append({
-                "id": fila[0],
-                "nombre": fila[1],
-                "cantidad": fila[2],
-                "id_laboratorio": fila[3]
+                "IdMaterial": fila[0],
+                "Nombre_Material": fila[1],
+                "Cantidad": fila[2],
+                "IdLaboratorio": fila[3],
+                "Ruta_Imagen": fila[4]  # Tomado directamente de tu columna en la tabla
             })
         
+        cursor.close()
         conn.close()
         return jsonify(materiales), 200
-
     except Exception as e:
         conn.rollback()
         conn.close()
@@ -141,45 +156,105 @@ def obtener_materiales_por_nombre(nombre):
         conn.close()
         return jsonify({"error": str(e)}), 500
     
-    
+
 # AGREGAR UN NUEVO MATERIAL
+# Configurar la carpeta donde se guardarán físicamente las imágenes
+CARPETA_UPLOADS = os.path.join('static', 'uploads')
+app.config['UPLOAD_FOLDER'] = CARPETA_UPLOADS
+
+# Asegurarse de que la carpeta exista en el servidor, si no, crearla
+if not os.path.exists(CARPETA_UPLOADS):
+    os.makedirs(CARPETA_UPLOADS)
+
 @app.route('/api/materiales', methods=['POST'])
 def agregar_material():
     try:
-        data = request.json 
+        nombre = request.form.get('nombre')
+        id_lab = request.form.get('id_lab')
+        
+        cantidad_raw = request.form.get('cantidad')
+        cantidad = int(cantidad_raw) if cantidad_raw is not None and cantidad_raw.isdigit() else None
+        
+        url_texto = request.form.get('url_texto', default=None)
+
+        # 2. VALIDACIONES DE CAMPOS OBLIGATORIOS (Adaptadas a tu lógica de diccionario)
+        data_validacion = {
+            "nombre": nombre,
+            "cantidad": cantidad_raw, # Validamos la cadena original primero
+            "id_lab": id_lab
+        }
+        
         campos_obligatorios = ["nombre", "cantidad", "id_lab"]
-        
         for campo in campos_obligatorios:
-            if campo not in data or data[campo] is None or data[campo] == "":
-                return jsonify({"error": f"El campo '{campo}' es obligatorio y no puede ser nulo"}), 400 #mensaje de error de que falto llenar un campo
-        if not isinstance(data["cantidad"], int) or data["cantidad"] < 0:
+            if campo not in data_validacion or data_validacion[campo] is None or str(data_validacion[campo]).strip() == "":
+                return jsonify({"error": f"El campo '{campo}' es obligatorio y no puede ser nulo"}), 400
+
+        # Validar que la cantidad sea un entero válido y positivo
+        if cantidad is None or cantidad < 0:
             return jsonify({"error": "La cantidad debe ser un número entero positivo"}), 400
-        
+
+        # 3. PROCESAMIENTO DE LA IMAGEN (CORREGIDO: Renombrado dinámico con el nombre del material)
+        ruta_imagen_db = None
+
+        if 'imagen' in request.files:
+            file = request.files['imagen']
+            if file.filename != '':
+                # Extraemos la extensión original (.png, .jpg, etc.)
+                extension = os.path.splitext(secure_filename(file.filename))[1].lower()
+                
+                # Sanitizamos el nombre del material para que sea un nombre de archivo seguro
+                # Convierte a minúsculas y cambia espacios por guiones bajos (ej: "Matraz Erlenmeyer" -> "matraz_erlenmeyer")
+                nombre_archivo_seguro = secure_filename(nombre.strip().lower().replace(" ", "_"))
+                
+                # Construimos el nombre final concatenando el nombre del material y su extensión
+                nombre_final_imagen = f"{nombre_archivo_seguro}{extension}"
+                
+                # Ruta física en el disco dentro del servidor
+                ruta_guardado = os.path.join(app.config['UPLOAD_FOLDER'], nombre_final_imagen)
+                
+                # Asegurar que el directorio exista antes de guardar el archivo físico
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                file.save(ruta_guardado)
+                
+                # Ruta relativa estándar que se almacenará textualmente en la base de datos
+                ruta_imagen_db = f"static/uploads/{nombre_final_imagen}"
+                
+        elif url_texto and url_texto.strip() != "":
+            # Si no subió archivo pero sí una URL manual
+            ruta_imagen_db = url_texto.strip()
+
+        # 4. BASE DE DATOS (Mantenimiento de tu estructura pyodbc)
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        # Añadida la columna Ruta_Imagen y su respectivo parámetro (?)
         query = """
-            INSERT INTO material (Nombre_Material, Cantidad, IdLaboratorio)
+            INSERT INTO material (Nombre_Material, Cantidad, IdLaboratorio, Ruta_Imagen)
             OUTPUT INSERTED.IdMaterial
-            VALUES (?, ?, ?)
+            VALUES (?, ?, ?, ?)
         """
-        cursor.execute(query, (data["nombre"], data["cantidad"], data["id_lab"]))
         
-       
+        # Ejecutamos pasando de forma segura los 4 parámetros ordenados
+        cursor.execute(query, (nombre, cantidad, int(id_lab), ruta_imagen_db))
+        
+        # Capturamos el ID generado por el OUTPUT INSERTED
         nuevo_id = cursor.fetchone()[0] 
         conn.commit()
-        
+        cursor.close() # Buena práctica: cerrar el cursor explícitamente
         conn.close()
 
         return jsonify({
             "mensaje": "Material registrado con éxito",
-            "id": nuevo_id
+            "id": nuevo_id,
+            "ruta_imagen": ruta_imagen_db
         }), 201
-
     except Exception as e:
+
         conn.rollback()
         conn.close()
         return jsonify({"error": str(e)}), 500
+
+   
 
 # ACTUALIZAR UN MATERIAL EXISTENTE
 @app.route('/api/materiales/<int:id>', methods=['PUT'])
@@ -189,33 +264,61 @@ def actualizar_material(id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Verificamos si el material existe
+        # 1. Verificamos si el material existe en la base de datos
         query = "SELECT IdMaterial FROM material WHERE IdMaterial = ?"
         cursor.execute(query, (id,))
         fila = cursor.fetchone()
 
         if not fila:
-            return jsonify({"mensaje": "No se encontro el material"}), 404
+            cursor.close()
+            conn.close()
+            return jsonify({"mensaje": "No se encontró el material"}), 404
         
-        # Validamos los campos a actualizar
-        campos_actualizables = ["nombre", "cantidad", "id_lab"]
+        # 2. CORRECCIÓN: Validamos usando las llaves reales en PascalCase del Frontend
+        campos_actualizables = ["Nombre_Material", "Cantidad", "IdLaboratorio"]
         for campo in campos_actualizables:
             if campo not in data or data[campo] is None or data[campo] == "":
+                cursor.close()
+                conn.close()
                 return jsonify({"error": f"El campo '{campo}' es obligatorio y no puede ser nulo"}), 400
-        if not isinstance(data["cantidad"], int) or data["cantidad"] < 0:
+        
+        # Validación extra del tipo de dato para el stock
+        if not isinstance(data["Cantidad"], int) or data["Cantidad"] < 0:
+            cursor.close()
+            conn.close()
             return jsonify({"error": "La cantidad debe ser un número entero positivo"}), 400
         
-        # Actualizamos el material
-        query = "UPDATE material SET Nombre_Material = ?, Cantidad = ?, IdLaboratorio = ? WHERE IdMaterial = ?"
-        cursor.execute(query, (data["nombre"], data["cantidad"], data["id_lab"], id))
+        # Opcional: Obtener la ruta de la imagen si viene en la petición, si no, dejarla vacía o mantener la anterior
+        ruta_imagen = data.get("Ruta_Imagen", "")
+        
+        # 3. CORRECCIÓN: Actualizamos incluyendo la columna Ruta_Imagen en el mismo query
+        query = """
+            UPDATE material 
+            SET Nombre_Material = ?, Cantidad = ?, IdLaboratorio = ?, Ruta_Imagen = ? 
+            WHERE IdMaterial = ?
+        """
+        cursor.execute(query, (
+            data["Nombre_Material"], 
+            data["Cantidad"], 
+            data["IdLaboratorio"], 
+            ruta_imagen, 
+            id
+        ))
+        
         conn.commit()
-
+        cursor.close()
         conn.close()
+        
         return jsonify({"mensaje": "Material actualizado con éxito"}), 200
 
     except Exception as e:
-        conn.rollback()
-        conn.close()
+        # Control de cierres seguros en caso de error fortuito antes o después de conectar
+        try:
+            conn.rollback()
+            cursor.close()
+            conn.close()
+        except:
+            pass
         return jsonify({"error": str(e)}), 500
 
 #Eliminar un material
@@ -391,6 +494,38 @@ def obtener_bitacora_incidencias_por_laboratorio(id_lab):
 
 #ELIMINAR UN REGISTRO DE LA BITACORA DE INCIDENCIA
 
+
+
+
+#usuario
+@app.route('/api/usser/laboratorios/<string:nombre>', methods=['GET'])
+def obtener_laboratorio_por_idUsuario(nombre):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Buscamos el laboratorio específico por su ID único
+        query = "SELECT IdUsuario,Usuario, Contrasenia , IdLaboratorio FROM usuario WHERE Usuario = ?"
+        cursor.execute(query, (nombre,))
+        fila = cursor.fetchone()
+
+        if not fila:
+            return jsonify({"mensaje" : "No se encontro el laboratorio"}),400
+        
+        usuario = {
+            "id": fila[0],
+            "Usuario": fila[1],
+            "Contrasenia": fila[2],
+            "IdLaboratorio": fila[3]
+        }
+        
+        conn.close()
+        return jsonify(usuario), 200
+
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     # Esto levanta el servidor en el puerto 5000

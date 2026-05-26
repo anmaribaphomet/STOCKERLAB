@@ -33,7 +33,20 @@ btnEditorial.addEventListener('click', () => {
 });
 
 
-//-------------------------SECCION DESTINADA A LAS VENTAS-----------------------------------------------------------------------------------
+//-------------------------SECCION DESTINADA A LAS BITACORAS-----------------------------------------------------------------------------------
+
+function obtenerIdLab() {
+    // IMPORTANTE: Asegúrate de usar el mismo nombre de llave en todo tu proyecto ("idLaboratorio")
+    const idLab = sessionStorage.getItem("idLaboratorio");
+
+    if (!idLab) {
+        console.error("No se encontró una sesión activa de laboratorio.");
+        window.location.href = "../login.html";
+        throw new Error("Sesión inválida: Redirigiendo al login.");
+    }
+    return idLab;
+}
+
 
 
 /*Funcion correspondiente al mapeo de las ventas , aqui se encuentra el card que se genera dinamicamente con la disposcion adecuada
@@ -559,7 +572,7 @@ async function cargarDatosTabla() {
         </td>
 
     `;
-//Evento para eliminar la fila del producto agregado a la tabla del carrito
+    //Evento para eliminar la fila del producto agregado a la tabla del carrito
     const btnEliminar = fila.querySelector('.btn-eliminar-tabla');
     btnEliminar.addEventListener('click', () => {
         console.log(btnEliminar)
