@@ -15,6 +15,25 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarMaterial();
 });
 
+async function cargarNombreLaboratorio() {
+    try {
+        // Hacemos una petición a tu API de Flask para traer los datos del lab actual
+        const respuesta = await fetch(`http://localhost:5000/api/laboratorios/${obtenerIdLab()}`);
+        const datosLab = await respuesta.json();
+
+        console.log("Datos del laboratorio obtenido:", datosLab.categoria); // Verifica que estás recibiendo el nombre correctamente
+        if (respuesta.ok) {
+            // Asumiendo que Flask devuelve algo como { "nombre": "Química" }
+            document.getElementById('nombre-lab-dinamico').textContent = datosLab.categoria;
+        }
+    } catch (error) {
+        console.error("Error al obtener el nombre del laboratorio:", error);
+    }
+}
+
+// Ejecutamos la función apenas cargue la pantalla
+cargarNombreLaboratorio();
+
 async function verificarServidor() {
     const contenedor = document.getElementById('status-server');
     const texto = document.getElementById('status-text');

@@ -1,30 +1,45 @@
 :root {
     /* 🌌 FONDOS (Modo Claro / Pasteles Lavanda de la foto) */
-    --bg-body: #dce0e8;        /* Fondo grisáceo/lavanda de los laterales de la pantalla */
-    --bg-muted2: #dfd8ea;     /* Fondo del contenedor principal ("Materiales") */
-    --bg-body2: #845e9f;       /* Header superior morado vibrante (donde dice STOCKERLAB) */
-    --bg-container: #D2C6D6;   /* Fondo general secundario para secciones */
-    --bg-card: #a3abbd;        /* Color gris azulado/lavanda opaco de las tarjetas */
+    --bg-body: #dce0e8;
+    /* Fondo grisáceo/lavanda de los laterales de la pantalla */
+    --bg-muted2: #dfd8ea;
+    /* Fondo del contenedor principal ("Materiales") */
+    --bg-body2: #845e9f;
+    /* Header superior morado vibrante (donde dice STOCKERLAB) */
+    --bg-container: #D2C6D6;
+    /* Fondo general secundario para secciones */
+    --bg-card: #a3abbd;
+    /* Color gris azulado/lavanda opaco de las tarjetas */
 
     /* 💎 ACENTOS y PESTAÑAS (Fiel a la interfaz) */
-    --accent-main: #c4b5db;    /* Pestaña activa ("Materiales") - un lavanda claro */
-    --accent-hover: #b0a0ca;   /* Efecto hover sobre elementos interactivos */
-    --accent-soft: transparent; /* Pestañas inactivas (en la foto no tienen fondo, solo texto) */
+    --accent-main: #c4b5db;
+    /* Pestaña activa ("Materiales") - un lavanda claro */
+    --accent-hover: #b0a0ca;
+    /* Efecto hover sobre elementos interactivos */
+    --accent-soft: transparent;
+    /* Pestañas inactivas (en la foto no tienen fondo, solo texto) */
 
     /* 📝 TEXTOS (Alta legibilidad en modo claro) */
-    --text-main: #845e9f;      /* Blanco para el logo principal y textos dentro de botones oscuros */
-    --text-muted: #53457a;     /* Morado oscuro/grisáceo para el título "Materiales" y textos de las tarjetas */
-    --text-card-detail: #5d6b82; /* Color gris para los subtítulos dentro de las tarjetas (ej. "Laboratorio...") */
-    
+    --text-main: #845e9f;
+    /* Blanco para el logo principal y textos dentro de botones oscuros */
+    --text-muted: #53457a;
+    /* Morado oscuro/grisáceo para el título "Materiales" y textos de las tarjetas */
+    --text-card-detail: #5d6b82;
+    /* Color gris para los subtítulos dentro de las tarjetas (ej. "Laboratorio...") */
+
     /* 🎛️ COMPONENTES (Buscador y Caja de herramientas) */
-    --input-bg: #ffffff;       /* Fondo completamente blanco para la barra de búsqueda e ID */
-    --border-color: #ced4da;   /* Bordes suaves y claros para los inputs */
-    --border-focus: #845e9f;   /* Borde morado al hacer foco en la búsqueda */
+    --input-bg: #ffffff;
+    /* Fondo completamente blanco para la barra de búsqueda e ID */
+    --border-color: #ced4da;
+    /* Bordes suaves y claros para los inputs */
+    --border-focus: #845e9f;
+    /* Borde morado al hacer foco en la búsqueda */
 
     /* 🚨 ESTADOS */
-    --danger: #e63946;         
-    --success: #2a9d8f;        
+    --danger: #e63946;
+    --success: #2a9d8f;
 }
+
 /* -------ZONA PRINCIPAL APARIENCIA GENERAL DE STOCKERLAB */
 body {
     margin: 0;
@@ -48,7 +63,7 @@ body {
 /* Header */
 .navbar {
     background-color: var(--bg-body2);
-    color:white;
+    color: white;
     padding: 10px 20px;
     display: flex;
     justify-content: space-between;
@@ -70,7 +85,8 @@ body {
 .lab-subtitulo {
     font-size: 0.6em;
     font-weight: normal;
-    color: var(--accent-hover); /* El subtítulo resalta en azul clarito */
+    color: var(--accent-hover);
+    /* El subtítulo resalta en azul clarito */
     text-transform: uppercase;
     margin-left: 5px;
 }
@@ -150,7 +166,7 @@ body {
     position: relative;
     right: -110px;
     margin-bottom: 50px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border-color);
 }
 
@@ -189,12 +205,12 @@ body {
 }
 
 #btn-buscar-filtro {
-    background: #acb0be; 
-    border: none; 
-    border-radius: 50%; 
-    width: 40px; 
-    height: 40px; 
-    cursor: pointer; 
+    background: #acb0be;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
     transition: 0.2s;
     display: flex;
     align-items: center;
@@ -221,10 +237,11 @@ body {
     border-radius: 20px;
     /* Efecto "Tanque de luz": Brillo interior, brillo exterior y un borde semi-transparente */
     border: 1px solid rgba(96, 165, 250, 0.4);
-    box-shadow: 
-        0 0 40px var(--glow-blue), 
-        inset 0 0 30px var(--glow-cyan), 
-        inset 0 0 100px rgba(0, 0, 0, 0.4); /* Le da profundidad en el centro */
+    box-shadow:
+        0 0 40px var(--glow-blue),
+        inset 0 0 30px var(--glow-cyan),
+        inset 0 0 100px rgba(0, 0, 0, 0.4);
+    /* Le da profundidad en el centro */
 }
 
 #contenedor-incidencias {
@@ -346,7 +363,8 @@ body {
 /* Boton agregar formulario */
 .btns {
     background-color: var(--accent-main);
-    border: 1px solid rgba(96, 165, 250, 0.6); /* Borde luminoso */
+    border: 1px solid rgba(96, 165, 250, 0.6);
+    /* Borde luminoso */
     padding: 10px 20px;
     color: white;
     border-radius: 170px;
@@ -363,9 +381,9 @@ body {
     background-color: var(--accent-hover);
     transform: translateY(-2px);
     /* El botón "se enciende" radiactivamente al pasar el mouse */
-    box-shadow: 
-        0 0 20px var(--glow-blue-strong), 
-        0 0 40px var(--accent-hover), 
+    box-shadow:
+        0 0 20px var(--glow-blue-strong),
+        0 0 40px var(--accent-hover),
         inset 0 0 15px rgba(255, 255, 255, 0.4);
     border-color: #ffffff;
 }
@@ -600,10 +618,184 @@ select.select-int option {
 
 /* ANIMACIONES */
 @keyframes popIn {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .animate-pop {
     animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+
+/*SALIDA BTN*/
+.btn-exit {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    outline: none;
+}
+
+
+.exit-icon {
+    width: 22px;
+    height: 22px;
+    color: #875498;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+
+.btn-exit:hover {
+    background-color: rgba(135, 84, 152, 0.1);
+
+}
+
+.btn-exit:hover .exit-icon {
+    color: #744484;
+    transform: translateX(2px);
+}
+
+.btn-exit:active {
+    transform: scale(0.92);
+}
+
+/* ESTADO DEL SERVIDOR */
+.server-status-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #fbf9fc;
+    border: 1px solid #e1d4e8;
+    padding: 8px 16px;
+    border-radius: 12px;
+    margin-left: auto;
+    margin-right: 15px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+}
+
+.status-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6a5377;
+    letter-spacing: 0.3px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #bbb0c4;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.status-dot::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    left: 0;
+    top: 0;
+    animation: status-pulse 2s infinite ease-in-out;
+    opacity: 0;
+}
+
+.server-status-box.online {
+    border-color: #d4edd9;
+    background-color: #f4faf6;
+}
+
+.server-status-box.online .status-dot {
+    background-color: #2ecc71;
+}
+
+.server-status-box.online .status-dot::after {
+    background-color: #2ecc71;
+}
+
+.server-status-box.online .status-text {
+    color: #27ae60;
+}
+
+
+.server-status-box.offline {
+    border-color: #f5c6cb;
+    background-color: #fdf3f4;
+}
+
+.server-status-box.offline .status-dot {
+    background-color: #e74c3c;
+}
+
+.server-status-box.offline .status-dot::after {
+    background-color: #e74c3c;
+}
+
+.server-status-box.offline .status-text {
+    color: #c0392b;
+
+}
+
+@keyframes status-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(2.6);
+        opacity: 0;
+    }
+}
+
+
+/*SALIDA BTN*/
+.btn-exit {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    outline: none;
+}
+
+
+.exit-icon {
+    width: 22px;
+    height: 22px;
+    color: #875498;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+
+.btn-exit:hover {
+    background-color: rgba(135, 84, 152, 0.1);
+
+}
+
+.btn-exit:hover .exit-icon {
+    color: #744484;
+    transform: translateX(2px);
+}
+
+.btn-exit:active {
+    transform: scale(0.92);
 }

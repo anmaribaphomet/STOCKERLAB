@@ -971,3 +971,22 @@ select.select-tipo option {
         opacity: 0;
     }
 }
+
+.logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.lab-subtitulo {
+    font-size: 0.6em;
+    font-weight: normal;
+    color: var(--accent-hover);
+    /* El subtítulo resalta en azul clarito */
+    text-transform: uppercase;
+    margin-left: 5px;
+}

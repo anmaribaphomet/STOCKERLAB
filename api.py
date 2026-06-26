@@ -20,8 +20,8 @@ def get_db_connection():
    #conexion maria
     conexion = pyodbc.connect(
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=DESKTOP-RO62CP8\\MARILUBERSK;'
-        #'SERVER=localhost\\SQLEXPRESS;'
+        #'SERVER=DESKTOP-RO62CP8\\MARILUBERSK;'
+        'SERVER=localhost\\SQLEXPRESS;'
         #'SERVER=db.stockerlab.local;'
         'DATABASE=stockerlab;'
         'UID=Super_Stocker;'

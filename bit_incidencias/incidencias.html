@@ -14,7 +14,11 @@
     <!--SECCION DE MENU-->
     <header class="navbar">
         <h1 class="logo">STOCKERLAB <span id="nombre-lab-dinamico" class="lab-subtitulo">...</span></h1>
-        <button class="btn-caja"><i data-lucide="user"></i> Usuario</button>
+        <div id="status-server" class="server-status-box">
+            <span class="status-dot"></span>
+            <span id="status-text" class="status-text">Conectando...</span>
+        </div>
+        <button class="btn-caja"><i data-lucide="user"></i> <span id="txt-usuario-header">Usuario</span></button>
     </header>
 
     <nav class="tabs">
@@ -27,15 +31,15 @@
     <div class="contenedor-principal">
         <main class="container">
 
-                </button>
+            </button>
             <!-- Menú de navegación de Incidencias -->
             <div class="contenedor-botones">
                 <h1 style="margin-top: 2%; margin-left: 120px;">BITÁCORA DE INCIDENCIAS</h1>
-               
+
             </div>
-         
+
             <div class="buscador-incidencias">
-               
+
                 <select id="tipo-filtro">
                     <option value="id">ID</option>
                     <option value="Profesor">Profesor</option>
@@ -50,7 +54,7 @@
                 </button>
             </div>
             <div class="content-incidencias-p">
-             <input type="button" id="btnagregar" class="btns" data-lucide="plus" onclick="mapForm('agregar')">
+                <input type="button" id="btnagregar" class="btns" data-lucide="plus" onclick="mapForm('agregar')">
 
                 <div id="contenedor-incidencias">
 
@@ -67,7 +71,9 @@
 
     </div>
     <footer class="bottom-bar">
-        <i data-lucide="log-out" class="exit-icon"></i>
+        <button id="btn-cerrar-sesion" class="btn-exit" title="Cerrar Sesión">
+            <i data-lucide="log-out" class="exit-icon"></i>
+        </button>
     </footer>
     <script src="incidencias.js"></script>
 

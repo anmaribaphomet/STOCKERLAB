@@ -1,8 +1,17 @@
 //-----------------------------------------SECCION DE NAV BAR E ICONOS
 // Inicializar la carga de las incidencias al cargar la pagina y activar los iconos de lucide
 document.addEventListener('DOMContentLoaded', () => {
+    const nombreUsuario = obtenerNombreUsuario(); // Obtiene el nombre o redirige
+    const elementoHeader = document.getElementById('txt-usuario-header');
+    // --- LOGICA DEL SEMÁFORO DEL SERVIDOR ---
+    verificarServidor(); // Primera revisión al cargar
+    setInterval(verificarServidor, 30000); // Revisa el estado automáticamente cada 30 segundos
+    if (elementoHeader) {
+        elementoHeader.textContent = nombreUsuario;
+    }
     cargarIncidencias();
     lucide.createIcons();
+
 });
 
 // Animacion del cambio de pestañas(tabs del navbar)
@@ -31,13 +40,42 @@ btnbit_materiales.addEventListener('click', () => {
     window.location.href = '../bit_materiales/bitacora.html';
 });
 
+
+async function verificarServidor() {
+    const contenedor = document.getElementById('status-server');
+    const texto = document.getElementById('status-text');
+    const dot = document.querySelector('.status-dot');
+
+    if (!contenedor || !texto) return;
+
+    try {
+        // Hacemos la petición a tu endpoint de Flask
+        const response = await fetch('http://127.0.0.1:5000/api/ping');
+        const data = await response.json();
+
+        if (response.ok && data.status === 'online') {
+            // Cambiamos clases a ONLINE
+            contenedor.classList.remove('offline');
+            contenedor.classList.add('online');
+            texto.textContent = 'Servidor Activo';
+        } else {
+            throw new Error('Status offline devuelto por la API');
+        }
+    } catch (error) {
+        // Cambiamos clases a OFFLINE en caso de error o caída de red
+        contenedor.classList.remove('online');
+        contenedor.classList.add('offline');
+        texto.textContent = 'Sin Conexión';
+        console.error("Error de verificación del servidor:", error);
+    }
+}
 //---------------------------OBTRENER EL ID DEL LABORATORIO DESDE EL LOCAL STORAGE PARA USARLO EN LAS SOLICITUDES AL SERVIDOR-------------------------------
 const ID_LAB_ACTUAL = 1;
 
 async function cargarNombreLaboratorio() {
     try {
         // Hacemos una petición a tu API de Flask para traer los datos del lab actual
-        const respuesta = await fetch(`http://localhost:5000/api/laboratorios/${ID_LAB_ACTUAL}`);
+        const respuesta = await fetch(`http://localhost:5000/api/laboratorios/${obtenerIdLab()}`);
         const datosLab = await respuesta.json();
 
         console.log("Datos del laboratorio obtenido:", datosLab.categoria); // Verifica que estás recibiendo el nombre correctamente
@@ -54,7 +92,29 @@ async function cargarNombreLaboratorio() {
 cargarNombreLaboratorio();
 
 //-------------------------SECCION DESTINADA A OBTENER LAS INCIDENCIAS-----------------------------------------------------------------------------------
+function obtenerIdLab() {
+    // IMPORTANTE: Asegúrate de usar el mismo nombre de llave en todo tu proyecto ("idLaboratorio")
+    const idLab = sessionStorage.getItem("idLaboratorio");
 
+    if (!idLab) {
+        console.error("No se encontró una sesión activa de laboratorio.");
+        window.location.href = "../login.html";
+        throw new Error("Sesión inválida: Redirigiendo al login.");
+    }
+    return idLab;
+}
+
+
+function obtenerNombreUsuario() {
+    const nombreUser = sessionStorage.getItem("nombreUsuario");
+
+    if (!nombreUser) {
+        console.error("No se encontró el nombre de usuario en la sesión activa.");
+        window.location.href = "../login.html";
+        throw new Error("Sesión inválida: Redirigiendo al login.");
+    }
+    return nombreUser;
+}
 //Funcion para mapear las incidencias obtenidas de la base de datos y mostrarlas en la pantalla en tarjetas dinamicas
 function mapearIncidencias(incidencias) {
 
@@ -75,7 +135,7 @@ function mapearIncidencias(incidencias) {
         const card = document.createElement('div');
         card.className = 'incidencia-card';
 
-       const fechaLimpia = incidencia.fecha.split('T')[0];
+        const fechaLimpia = incidencia.fecha.split('T')[0];
         //Card
         card.innerHTML = `
 
@@ -139,14 +199,14 @@ function mapearIncidencias(incidencias) {
 
         // BOTÓN ELIMINAR
         const btnEliminar = card.querySelector('.btn-eliminar');
-       btnEliminar.addEventListener('click', () => {
-       eliminarIncidencia(incidencia.id_bitacora); // 👈 ¡Todo en minúsculas!
-});
+        btnEliminar.addEventListener('click', () => {
+            eliminarIncidencia(incidencia.id_bitacora); // 👈 ¡Todo en minúsculas!
+        });
 
-       // BOTÓN ACTUALIZAR
+        // BOTÓN ACTUALIZAR
         const btnActualizar = card.querySelector('.btn-actualizar');
         btnActualizar.addEventListener('click', () => {
-            mapForm('actualizar', incidencia); 
+            mapForm('actualizar', incidencia);
         });
         contenedor.appendChild(card);
     });
@@ -156,7 +216,7 @@ function mapearIncidencias(incidencias) {
 //Funcion para cargar las incidencias al iniciar la pagina, hace una solicitud al servidor para obtener las incidencias y luego las envia a mapearse
 async function cargarIncidencias() {
     try {
-        const respuesta = await fetch('http://localhost:5000/api/bitacora/incidencias/laboratorio/1');
+        const respuesta = await fetch(`http://localhost:5000/api/bitacora/incidencias/laboratorio/${obtenerIdLab()}`);
         const incidencias = await respuesta.json();
         mapearIncidencias(incidencias);
         console.log(incidencias);
@@ -179,21 +239,21 @@ async function buscarIncidencias() {
         cargarIncidencias();
         return;
     }
-    
+
     switch (tipoFiltro) {
         case 'id':
             const valorBusqueda = parseInt(valor);
             console.log(valorBusqueda)
-           url = `http://localhost:5000/api/bitacora/incidencias/laboratorio/1/${valorBusqueda}`;
+            url = `http://localhost:5000/api/bitacora/incidencias/laboratorio/${obtenerIdLab()}/${valorBusqueda}`;
             //En este segun lo que el cliente ingreso en el input lo coloca para mandar llamar el edpoint
             break;
 
         case 'Profesor':
-            url = `http://localhost:5000/api/bitacora/incidencias/laboratorio/1/maestro/${valor}`;
+            url = `http://localhost:5000/api/bitacora/incidencias/laboratorio/${obtenerIdLab()}/maestro/${valor}`;
             break;
 
         case 'Alumno':
-            url = `http://localhost:5000/api/bitacora/incidencias/laboratorio/1/alumno/${valor}`;
+            url = `http://localhost:5000/api/bitacora/incidencias/laboratorio/${obtenerIdLab()}/alumno/${valor}`;
             break;
     }
     try {
@@ -231,7 +291,7 @@ search.addEventListener('click', () => {//Boton que al clickear ejecuta el event
 //METODO PARA MAPEAR LOS FORMULARIOS DE ACTUALIZAR Y CREAR
 function mapForm(tipo, datos = null) {
     const contenedor = document.getElementById('Form-incidencias');
-    
+
     // Bloque HTML para el paso de cantidades, reutilizado tanto en "Agregar" como en "Actualizar" 
     const bloqueCantidad = `
         <div class="field">
@@ -274,15 +334,15 @@ function mapForm(tipo, datos = null) {
         `;
 
         cargarCombo();// Carga el combo de materiales para el formulario de agregar
-      
-     //Mapeo para el form de actualizar, se le pasan los datos de la incidencia seleccionada para que se muestren en el formulario y se puedan modificar
+
+        //Mapeo para el form de actualizar, se le pasan los datos de la incidencia seleccionada para que se muestren en el formulario y se puedan modificar
     } else if (tipo === 'actualizar') {
-          const fechaLimpia = datos.fecha.split('T')[0];
+        const fechaLimpia = datos.fecha.split('T')[0];
         // Escudo protector: Si 'datos' viene vacío, cancelamos antes de que explote
         if (!datos) {
             console.error("Error: No se enviaron los datos al formulario de actualización");
             alert("No se pudo cargar la información de esta incidencia.");
-            return; 
+            return;
         }
 
         contenedor.style.display = 'flex';
@@ -315,9 +375,9 @@ function mapForm(tipo, datos = null) {
             </form>
         `;
         cargarCombo(datos.id_material);
-       
+
     }
-    
+
 }
 //FUNCION PARA GUARDAR EL FORMULARIO DE AGREGAR(POST)
 async function guardarIncidencia() {
@@ -326,14 +386,14 @@ async function guardarIncidencia() {
     if (!payload) return; // Si no pasa las validaciones de JS, detiene la ejecución
 
     try {
-        const respuesta = await fetch(`http://localhost:5000/api/bitacora/incidencias/laboratorio/${ID_LAB_ACTUAL}`, {
+        const respuesta = await fetch(`http://localhost:5000/api/bitacora/incidencias/laboratorio/${obtenerIdLab()}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
         const resultado = await respuesta.json();
-if (respuesta.ok) {
+        if (respuesta.ok) {
             // Alerta de éxito con estilo oscuro y botón índigo
             Swal.fire({
                 title: '¡Guardado!',
@@ -348,7 +408,7 @@ if (respuesta.ok) {
                 // Poner esto dentro del .then() hace que el formulario se cierre 
                 // y la tabla se recargue JUSTO DESPUÉS de que el usuario le da "OK" a la alerta
                 document.getElementById('Form-incidencias').style.display = 'none';
-                cargarIncidencias(); 
+                cargarIncidencias();
             });
         } else {
             // Alerta de error (rechazo del servidor) con botón magenta
@@ -382,7 +442,7 @@ async function modificarIncidencia(id_inc) {
     if (!payload) return;
 
     try {
-        const respuesta = await fetch(`http://localhost:5000/api/bitacora/incidencias/laboratorio/${ID_LAB_ACTUAL}/${id_inc}`, {
+        const respuesta = await fetch(`http://localhost:5000/api/bitacora/incidencias/laboratorio/${obtenerIdLab()}/${id_inc}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -444,7 +504,7 @@ function cambiarCantidad(operacion) {
     if (!inputCantidad) return; // Si el input no existe, no hace nada
 
     let valorActual = parseInt(inputCantidad.value);
-    
+
     if (operacion === 'sumar') { // Si la operación es sumar, incrementa el valor actual en 1
         inputCantidad.value = valorActual + 1;
     } else if (operacion === 'restar' && valorActual > 1) { // Si la operación es restar y el valor actual es mayor a 1, decrementa el valor actual en 1
@@ -459,8 +519,8 @@ async function cargarCombo(id_material_seleccionado = null) {
 
     try {
         // Hacemos la petición a la API para obtener los materiales del laboratorio actual
-        const respuesta = await fetch(`http://localhost:5000/api/materiales/laboratorio/${ID_LAB_ACTUAL}`);
-        
+        const respuesta = await fetch(`http://localhost:5000/api/materiales/laboratorio/${obtenerIdLab()}`);
+
         if (!respuesta.ok) {
             throw new Error("Error en la respuesta del servidor");
         }
@@ -470,11 +530,11 @@ async function cargarCombo(id_material_seleccionado = null) {
         // Limpiamos el combo y colocamos la opción por defecto inicial
         selectMaterial.innerHTML = '<option value="">-- Seleccione un Material --</option>';
 
-      // Recorremos la lista de materiales que nos devolvió Flask
+        // Recorremos la lista de materiales que nos devolvió Flask
         materiales.forEach(material => {
             const opcion = document.createElement('option');
-            
-            
+
+
             opcion.value = material.IdMaterial;// El valor de la opción es el ID del material          
             opcion.textContent = material.Nombre_Material; // El texto que se muestra en el combo es el nombre del material
 
@@ -610,4 +670,50 @@ async function eliminarIncidencia(id) {//Metodo para eliminar una incidencia des
         });
     }
 }
-//-------------------------SECCION DESTINADA A LA ACTUALIZACION DE LAS INCIDENCIAS-----------------------------------------------------------------------------------
+//CERRAR SESION
+function cerrarSesion() {
+    Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: 'Tendrás que ingresar tus credenciales nuevamente para acceder.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#8b5a96',
+        cancelButtonColor: '#bfaec6',
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar',
+        zIndex: 999999
+    }).then((result) => {
+        if (result.isConfirmed) {
+
+            sessionStorage.removeItem("idLaboratorio");
+            sessionStorage.removeItem("nombreUsuario");
+
+            window.location.href = "../login.html";
+        }
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    obtenerIdLab();
+    const nombreUsuario = obtenerNombreUsuario();
+
+    const elementoHeader = document.getElementById('txt-usuario-header');
+    if (elementoHeader) {
+        elementoHeader.textContent = nombreUsuario;
+    }
+
+
+    const btnSalir = document.getElementById('btn-cerrar-sesion');
+    if (btnSalir) {
+        btnSalir.addEventListener('click', cerrarSesion);
+    }
+
+
+    configurarBotonAdd();
+    lucide.createIcons();
+    cargarMaterial();
+});
+
+
+
