@@ -1,8 +1,50 @@
-//SECCION DE NAV BAR E ICONOS
-// Inicializar iconos de Lucide
-lucide.createIcons();
+//-----------------------------------------SECCION DE NAV BAR E ICONOS
+// Inicializar la carga de las incidencias al cargar la pagina y activar los iconos de lucide
+document.addEventListener('DOMContentLoaded', () => {
+    const nombreUsuario = obtenerNombreUsuario(); // Obtiene el nombre o redirige
+    const elementoHeader = document.getElementById('txt-usuario-header');
+    // --- LOGICA DEL SEMÁFORO DEL SERVIDOR ---
+    verificarServidor(); // Primera revisión al cargar
+    setInterval(verificarServidor, 30000); // Revisa el estado automáticamente cada 30 segundos
+    if (elementoHeader) {
+        elementoHeader.textContent = nombreUsuario;
+    }
+    lucide.createIcons();
+    console.log(obtenerIdLab());
+    cargarBitacoras();
+});
 
-// Lgica simple para cambiar de tabs
+
+async function verificarServidor() {
+    const contenedor = document.getElementById('status-server');
+    const texto = document.getElementById('status-text');
+    const dot = document.querySelector('.status-dot');
+
+    if (!contenedor || !texto) return;
+
+    try {
+        // Hacemos la petición a tu endpoint de Flask
+        const response = await fetch('http://127.0.0.1:5000/api/ping');
+        const data = await response.json();
+
+        if (response.ok && data.status === 'online') {
+            // Cambiamos clases a ONLINE
+            contenedor.classList.remove('offline');
+            contenedor.classList.add('online');
+            texto.textContent = 'Servidor Activo';
+        } else {
+            throw new Error('Status offline devuelto por la API');
+        }
+    } catch (error) {
+        // Cambiamos clases a OFFLINE en caso de error o caída de red
+        contenedor.classList.remove('online');
+        contenedor.classList.add('offline');
+        texto.textContent = 'Sin Conexión';
+        console.error("Error de verificación del servidor:", error);
+    }
+}
+
+// Animacion del cambio de pestañas(tabs del navbar)
 const tabs = document.querySelectorAll('.tab');
 // Agregar evento de clic a cada tab
 tabs.forEach(tab => {
@@ -12,24 +54,25 @@ tabs.forEach(tab => {
         console.log(`Cambiando a: ${tab.textContent.trim()}`);
     });
 });
-
+//----- Funcionalidad de navegación
+//a inicio
 const btnInicio = document.getElementById('pp-nav');
 btnInicio.addEventListener('click', () => {
-    // Salimos de /catalogomangas/ y entramos a /pp/
+    // Salimos de /bitincidencias/ y entramos a /pp/
     window.location.href = '../pp/pp.html';
 });
-
-const btnMangas = document.getElementById('btn-nav-mangas');
-btnMangas.addEventListener('click', () => {
-    // Salimos de /catalogomangas/ y entramos a /pp/
-    window.location.href = '../catalogomangas/mangas.html';
+//a materiales
+const btnMateriales = document.getElementById('btn-nav-materiales');
+btnMateriales.addEventListener('click', () => {
+    // Salimos de /bitincidencias/ y entramos a /catalogomateriales/
+    window.location.href = '../catalogomateriales/materiales.html';
 });
+//a bitacora de materiales
+const btnbit_materiales = document.getElementById('btn-nav-bitacora')
 
-const btnEditorial = document.getElementById('btn-nav-editorial')
-
-btnEditorial.addEventListener('click', () => {
-    // Salimos de /catalogomangas/ y entramos a /pp/
-    window.location.href = '../editorial/editorial.html';
+btnbit_materiales.addEventListener('click', () => {
+    // Salimos de /bitincidencias/ y entramos a bitacora  de materiales
+    window.location.href = '../bit_materiales/bitacora.html';
 });
 
 
@@ -47,85 +90,92 @@ function obtenerIdLab() {
     return idLab;
 }
 
+function obtenerNombreUsuario() {
+    const nombreUser = sessionStorage.getItem("nombreUsuario");
 
+    if (!nombreUser) {
+        console.error("No se encontró el nombre de usuario en la sesión activa.");
+        window.location.href = "../login.html";
+        throw new Error("Sesión inválida: Redirigiendo al login.");
+    }
+    return nombreUser;
+}
 
-/*Funcion correspondiente al mapeo de las ventas , aqui se encuentra el card que se genera dinamicamente con la disposcion adecuada
-para mostrar en el formato incial datos :  num venta , total ,fecha y metodo de pago*/
+//-------------------------SECCION DESTINADA A OBTENER LAS INCIDENCIAS-----------------------------------------------------------------------------------
 
-/*NOTA : Tiene un paramatro puesto que mas abajo hay dos metodos uno para cargar todas las ventas que utiliza el edpoint
-de get y otro que se trata de un metodo filtro para buscar una venta especifica por id*/
-function mapearVentas(ventas) {
+//Funcion para mapear las incidencias obtenidas de la base de datos y mostrarlas en la pantalla en tarjetas dinamicas
+function mapearBitacoras(bitacoras) {
 
-    const contenedor = document.getElementById('contenedor-ventas');
+    const contenedor = document.getElementById('contenedor-bitacoras');
     contenedor.innerHTML = '';
-
-
-
-    if (!ventas) return;
-    // SI ES UNA SOLA VENTA
+    if (!bitacoras) return;
+    // SI ES UNA SOLA INCIDENCIA LA CONVIERTE EN UN
+    // ARRAY PARA QUE EL MAPEO FUNCIONE CORRECTAMENTE, SI YA ES UN ARRAY SIMPLEMENTE LO USA COMO ESTA
     //Valida que sea una array lo que le esta pasando
-    const listaVentas = Array.isArray(ventas)
-        ? ventas
-        : [ventas];
+    const listaBitacoras = Array.isArray(bitacoras)
+        ? bitacoras
+        : [bitacoras];//Si no es un array lo convierte en un array con un solo elemento que es la incidencia obtenida
 
-    listaVentas.forEach(venta => {
+    listaBitacoras.forEach(bitacoras => {//Por cada incidencia obtenida de la base de datos se crea una card dinamica con la informacion de la incidencia
+        let tipoCard = bitacoras.tipo;
+
+        if (tipoCard == true) {
+            tipoCard = "Entrada";
+        } else {
+            tipoCard = "Salida";
+        }
         const card = document.createElement('div');
-        card.className = 'venta-card';
-        const listaArticulos = venta.articulos || [];
+        card.className = 'bitacoras-card';
 
-        //Listado con los articulos que se seleccionarion 
-        const articulosHTML = listaArticulos.map(art => `
-            <li class="articulo-item">
-                <div>
-                    <strong>${art.Nombre_Material}</strong>
-                </div>
-                <div class="articulo-info">
-                    <span>Cant: ${art.Cantidad}</span>
-                    <span>$${art.Tipo}</span>
-                </div>
-            </li>
-        `).join('');
 
         //Card
         card.innerHTML = `
-
-            <!-- BOTÓN ELIMINAR -->
-            <button 
-                class="btn-eliminar"
-                title="Eliminar venta">
-                <i data-lucide="trash-2"></i>
-            </button>
             <!-- BOTÓN ACTUALIZAR -->
             <button 
                 class="btn-actualizar"
-                title="Actualizar venta">
+                title="Actualizar Bitacora">
                 <i data-lucide="pencil"></i>
             </button>
-            <div class="venta-header">
+             <!-- BOTÓN ELIMINAR -->
+            <button 
+                class="btn-eliminar"
+                title="Eliminar Bitacoras">
+                <i data-lucide="trash-2"></i>
+            </button>
+            <div class="bitacora-header">
                 <div>
-                    <h3>Venta #${venta.Id_bit_inc}</h3>
-                    <p>${venta.Fecha}</p>
+                    <h3>Registro #${bitacoras.id_bitacora}</h3>
+                    <p>${bitacoras.fecha}</p>
                 </div>
-                <div class="venta-total">
-                    $${venta.Descripcion}
+                
+                <div class="bitacora-descripcion">
+                   ${tipoCard}
                 </div>
             </div>
-            <div class="venta-body">
+            <div class="bitacora-body">
                
             </div>
             <button class="btn-leer-mas">
                 Ver detalles
             </button>
             <div class="detalles">
-                <h4>Artículos</h4>
                 <ul>
-                    ${articulosHTML}
+                   <li class="bitacora-item">
+                <div>
+                    <strong>#${bitacoras.id_material + ' - ' + bitacoras.nombre_material}</strong>
+                </div>
+                <div class="bitacora-info">
+                     <span>Descripción: ${bitacoras.descripcion}</span>
+                     <span>Cantidad: ${bitacoras.cantidad}</span>
+                     <span>Exp. Maestro: ${bitacoras.exp_maestro}</span         
+                </div>
+            </li>
                 </ul>
             </div>
         `;
 
         // BOTÓN VER DETALLES
-        //Boton para ver los detalles que son la lista antes mencionada con los mangas que llevo el cliente
+        //Boton para ver los detalles del registro de la incidencia, al dar click se despliega una seccion con la informacion detallada 
         const botonDetalles = card.querySelector('.btn-leer-mas');
         const detalles = card.querySelector('.detalles');
 
@@ -138,43 +188,42 @@ function mapearVentas(ventas) {
         });
 
         // BOTÓN ELIMINAR
-        //Boton para eliminar la venta 
         const btnEliminar = card.querySelector('.btn-eliminar');
-
         btnEliminar.addEventListener('click', () => {
-            eliminarVenta(venta.Id_bit_inc);
+            eliminarBitacoraMaterial(bitacoras.id_bitacora);//Al dar click en el boton eliminar se ejecuta la funcion eliminarIncidencia que se encuentra mas abajo y se le pasa el id de la incidencia para eliminarla
         });
 
         // BOTÓN ACTUALIZAR
-        //Boton para actualizar la venta
         const btnActualizar = card.querySelector('.btn-actualizar');
         btnActualizar.addEventListener('click', () => {
-            actualizarVenta(venta);
+            actualizarBitacora(bitacoras);
         });
         contenedor.appendChild(card);
     });
     // ACTIVAR ICONOS LUCIDE
     lucide.createIcons();
 }
-async function cargarVentas() {
+//Funcion para cargar las incidencias al iniciar la pagina, hace una solicitud al servidor para obtener las incidencias y luego las envia a mapearse
+async function cargarBitacoras() {
     try {
-        const respuesta = await fetch('/api/bitacora/laboratorio/1');
-        const ventas = await respuesta.json();
-        mapearVentas(ventas);
-
+        const idPagina = obtenerIdLab();
+        const respuesta = await fetch(`http://localhost:5000/api/bitacora/laboratorio/${idPagina}`);
+        const bitacoras = await respuesta.json();
+        mapearBitacoras(bitacoras);
+        console.log(bitacoras);
     } catch (error) {
-        console.error("Error al obtener las ventas:", error);
+        console.error("Error al obtener las bitacoras:", error);
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    cargarVentas();
-});
 
 
-//Metodo para hacer la busqueda de las ventas por id
-async function buscarVentas() {
-    const tipoFiltro =//De un seleccion obtiene la opcion , en este caso solo es id
+
+//-------------------------SECCION DESTINADA A LA BUSQUEDA DE LAS INCIDENCIAS-----------------------------------------------------------------------------------
+//Metodo para hacer la busqueda de las bitacoras materiales por id
+async function buscarBitacoras() {
+    const IdEnUso = obtenerIdLab();
+    const tipoFiltro =//De un seleccion obtiene la opcion 
         document.getElementById('tipo-filtro').value;
     const valor =
         document.getElementById('input-busqueda')
@@ -182,53 +231,597 @@ async function buscarVentas() {
             .trim();//Obtiene el valor que se ingreso en el input
 
     if (valor === '') {//Cuando el input esta vacion se van a cargar todas las ventas que haya en la bd
-        cargarVentas();
+        cargarBitacoras();
         return;
     }
-    let url = '';
+
     switch (tipoFiltro) {
         case 'id':
             const valorBusqueda = parseInt(valor);
             console.log(valorBusqueda)
-            url = `http://127.0.0.1:5000/incidencias/${valorBusqueda}`;
+            url = `http://localhost:5000/api/bitacora/laboratorio/${IdEnUso}/${valorBusqueda}`;
             //En este segun lo que el cliente ingreso en el input lo coloca para mandar llamar el edpoint
             break;
+
+        case 'Profesor':
+            url = `http://localhost:5000/api/bitacora/laboratorio/${IdEnUso}/maestro/${valor}`;
+            break;
+
     }
     try {
         const respuesta = await fetch(url);//pide la informacion al servidor
         if (!respuesta.ok) {//si el servidor no obtiene nada va colocar un mensaje en la pantalla de que el id no fue encontrado
 
-            const contenedor =
-                document.getElementById('contenedor-ventas');
+            const contenedor = document.getElementById('contenedor-bitacoras');
 
             contenedor.innerHTML = `
                 <p class="mensaje-error">
-                    No se encontró ninguna venta con ese ID
+                    No se encontró ninguna bitacora con ese ID , ${valor}
                 </p>
             `;
 
             return;
         }
-        const ventas = await respuesta.json();//Si obtiene la informacion correctamente
+        const bitacoras = await respuesta.json();//Si obtiene la informacion correctamente
+        console.log(bitacoras);
 
-        mapearVentas(ventas)//Mandara llamar el metodo para que mapee la venta encontrada
+        mapearBitacoras(bitacoras)//Mandara llamar el metodo para que mapee la bitacora encontrada
 
     } catch (error) {
         console.error("Error en búsqueda:", error);
     }
 }
 
-
 const search = document.getElementById('btn-buscar-filtro');
 search.addEventListener('click', () => {//Boton que al clickear ejecuta el evento para que se busque la venta
-    buscarVentas();
+    buscarBitacoras();
 });
 
 
-//FUNCION PARA CREAR DINAMICAMENTE Y CARGAR EL FORM DE ELIMINA
-async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boton que se encuentra en las cards
-    const result = await Swal.fire({//Formato para avisar al usuario si esta seguro de eliminar la venta
-        title: '¿Seguro que quieres eliminar esta venta?',
+//-------------------------SECCION DESTINADA A LA CREACION DE BITACORAS-----------------------------------------------------------------------------------
+function actualizarBitacora(bitacora) {
+    mapForm('editar', bitacora);
+}
+const btnCrear = document.getElementById('btnagregar');
+//OBJETO QUE ALMACENARA LOS DATOS QUE CONSTITUYEN LA BITACORA MAT
+let datosBitacoraMateriales = {
+    idMaterial: '',
+    nombreMaterial: '',
+    cantidad: 1,
+    descripcion: '',
+    maestro: '',
+    tipoBitacora: 'Salida'
+};
+
+/**NOTA : CON EL FIN DE REUTILIZAR EL FORM Y LA MAYORIA DE LOS METODOS QUE HACEN QUE FUNCIONE , EL AGREGAR MATERIAL SE INCORPORARA */
+function mapForm(tipo, bitacora = null) {//El form debe aceptar datos opciones 
+    const contenedor = document.getElementById('Form-bitacoras');
+    // SI ES EDICIÓN
+    if (tipo === 'editar' && bitacora) {
+
+        datosBitacoraMateriales = {
+            idBitacora: bitacora.id_bitacora,
+            idMaterial: bitacora.id_material,
+            nombreMaterial: bitacora.nombre_material,
+            cantidad: bitacora.cantidad,
+            descripcion: bitacora.descripcion,
+            maestro: bitacora.exp_maestro,
+            tipoBitacora: bitacora.tipo ? 'Entrada' : 'Salida'
+        };
+
+        console.log(datosBitacoraMateriales);
+
+    } else {
+
+        // SI ES CREAR
+        datosBitacoraMateriales = {
+            idMaterial: '',
+            nombreMaterial: '',
+            cantidad: 1,
+            descripcion: '',
+            maestro: '',
+            tipoBitacora: 'Salida'
+        };
+    }
+
+    if (tipo === 'agregar' || tipo === 'editar') {//que acceda a este componente ya sea para agregar o editar
+        if (tipo === 'agregar') {
+            datosBitacoraMateriales = {
+                idMaterial: '',
+                nombreMaterial: '',
+                cantidad: 1,
+                descripcion: '',
+                maestro: '',
+                tipoBitacora: 'Salida'
+            };
+        }
+        contenedor.style.display = 'flex';
+
+        /**NOTA : Los componentes del tipo input y demas al tratarse inicialmente de un form de agregar, deben ser modificados
+         * para carguen datos que ya existen o reciban datos , dependiento el uso que se le de al componente
+         */
+        contenedor.innerHTML = `
+            <form id="form-actualizar" class="forms animate-pop">
+                <button type="button" class="btn-cerrar-dinamico" id="cerrar-form-agregar">
+                    &times;
+                </button>
+
+                <div class="contador">
+                    <div id="ventana1" class="cuadros">
+                        <div class="circulos" id="c-ventana1">
+                            <i data-lucide="check" id="icono-v1" class="icono-check-animado" style="width: 16px; height: 16px; color: white;"></i>
+                        </div>
+                        <p class="texto">
+                            Materiales
+                        </p>
+                    </div>
+
+
+                    <div class="linea"></div>
+                    <div id="ventana2" class="cuadros">
+                        <div class="circulos" id="c-ventana2">
+                            <i data-lucide="check" id="icono-v2" class="icono-check-animado" style="width: 16px; height: 16px; color: white;"></i>
+                        </div>
+                        <p class="texto">Info</p>
+                    </div>
+                    <div class="linea"></div>
+                    <div id="ventana3" class="cuadros">
+                        <div class="circulos" id="c-ventana3">
+                            <i data-lucide="check" id="icono-v3" class="icono-check-animado"style="width: 70%;"></i>
+                        </div>
+                        <p class="texto">
+                            Preview
+                        </p>
+                    </div>
+
+                </div>
+                <div id="contenedor-Etapas-Forms">
+                    <div id="primeraParte">
+                        <h2>${tipo === 'editar' ? 'Editar Bitácora' : 'Crear Bitácora'}</h2>
+                        <label>Selecciona el material:</label>
+                        <select name="Material" id="select-ids" class="select-tipo">
+                            <option value="">Cargando...</option>
+                        </select>
+                        <div id="cargar-Material">
+                            <!--Js insertara una card con el material-->
+                        </div>
+                        <button  type="button" id="nav-2">
+                            <i data-lucide="arrow-right" id="c-ventana3" style="width: 70%;"></i>
+                        </button>
+                    </div>
+
+                    <div id="segundaParte" style="display: none;">
+                        <h3>Info Bitacora</h3>
+                        <Label>${tipo === 'editar' ? 'Actualiza la descripcion' : 'Agrega una descripcion*'}</Label>
+                        <input 
+                            type="text"
+                            id="input-descripcion"
+                            placeholder="${tipo != 'editar' ? 'Descripcion' : ''}"
+                            value="${datosBitacoraMateriales.descripcion || ''}"
+                        >
+                        <Label>${tipo === 'editar' ? 'Actualiza el expediente del maestro' : 'Ingresa el expediente del profesor*'}</Label>
+                        <input 
+                            type="text"
+                            id="input-maestro"
+                            placeholder="${tipo != 'editar' ? 'Expediente Maestro' : ''}"
+                            value="${datosBitacoraMateriales.maestro || ''}"
+                        >
+
+                        <Label>${tipo === 'editar' ? 'Actualiza el tipo de bitacora' : 'Elije el tipo de bitacora*'}</Label>
+                        <select name="Tipo" id="select-tipo" class="select-tipo">
+                            <option value="Salida"
+                                ${datosBitacoraMateriales.tipoBitacora === 'Salida' ? 'selected' : ''}>
+                                Salida
+                            </option>
+                              <option value="Entrada"
+                                ${datosBitacoraMateriales.tipoBitacora === 'Entrada' ? 'selected' : ''}>
+                                Entrada
+                            </option>
+                        </select>
+
+                        <button type="button" id="nav-3">
+                            <i data-lucide="arrow-right" id="c-ventana3" style="width: 70%;"></i>
+                        </button>
+                        <button type="button" id="nav-4">
+                            <i data-lucide="arrow-left" id="c-ventana3" style="width: 70%;"></i>
+                        </button>
+                    </div>
+
+                    <div id="TerceraParte" style="display: none;">
+                        <h3>Resumen de Bitácora</h3>
+                        <div id="materiales-info">
+                            <!--js insertara la informacion del material-->
+                        </div>
+
+                        <div id="bitacora-info">
+                            <!--Js insertara la informacion de la bitacora-->
+                        </div>
+
+
+                        <button type="submit"
+                            id="${tipo === 'editar' ? 'botonC-editar' : 'botonC-agregar'}"
+                        >
+                            ${tipo === 'editar' ? 'Actualizar Bitácora' : 'Guardar Cambios'}
+                        </button>
+                        <button type="button"  id="nav-5">
+                            <i data-lucide="arrow-left" id="c-ventana3" style="width: 70%;"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        `;
+
+        cargarComboMateriales(tipo);
+        lucide.createIcons();
+
+        // Inicializar el menú superior en el paso 1 (sin palomitas)
+        cambioColorMenuSuperior('primeraParte');
+        const btnCerrarPost = document.getElementById('cerrar-form-agregar');
+        btnCerrarPost.addEventListener('click', () => {
+            contenedor.style.display = 'none';
+        });
+
+
+        //CONTROL DE NAVEGACIONES
+        const etapa1 = document.getElementById('primeraParte');
+        const etapa2 = document.getElementById('segundaParte');
+        const etapa3 = document.getElementById('TerceraParte');
+
+        const boton2 = document.getElementById('nav-2');
+
+        // AVANZAR A ETAPA 2
+        boton2.addEventListener('click', () => {
+            const selectMaterial = document.getElementById('select-ids');
+
+            // VALIDACIÓN: ¿Seleccionó un material válido?
+            if (!selectMaterial.value) {
+                Swal.fire({
+                    title: 'Atención',
+                    text: 'Por favor, selecciona un material antes de continuar.',
+                    icon: 'warning', // Usamos 'warning' (advertencia) ya que es un aviso preventivo
+                    confirmButtonColor: '#8b5a96', // Tu color morado característico
+                    confirmButtonText: 'Entendido',
+                    zIndex: 99999
+                });
+                return;
+            }
+
+            // Almacenar datos recolectados en la etapa 1
+            datosBitacoraMateriales.idMaterial = selectMaterial.value;
+            const inputCantidad = document.getElementById('display-cantidad');
+            datosBitacoraMateriales.cantidad = inputCantidad ? parseInt(inputCantidad.value) : 1;
+            // Transición
+            etapa1.style.display = 'none';
+            etapa2.style.display = 'block';
+            cambioColorMenuSuperior('segundaParte');
+        });
+
+
+        const boton3 = document.getElementById('nav-3');
+        // AVANZAR A ETAPA 3 
+        boton3.addEventListener('click', () => {
+            const desc = document.getElementById('input-descripcion').value.trim();
+            const maestro = document.getElementById('input-maestro').value.trim();
+            const tipo = document.getElementById('select-tipo').value;
+
+            // VALIDACIÓN: Campos vacíos
+            if (!desc || !maestro) {
+                Swal.fire({
+                    title: 'Atención',
+                    text: 'Por favor, rellena todos los campos obligatorios (*).',
+                    icon: 'warning',
+                    confirmButtonColor: '#8b5a96',
+                    confirmButtonText: 'Entendido',
+                    zIndex: 99999
+                });
+                return;
+            }
+
+            // Almacenar datos recolectados en la etapa 2
+            datosBitacoraMateriales.descripcion = desc;
+            datosBitacoraMateriales.maestro = maestro;
+            datosBitacoraMateriales.tipoBitacora = tipo;
+
+            // Generar dinámicamente el Resumen en la Etapa 3
+            generarResumen();
+
+            // Transición
+            etapa2.style.display = 'none';
+            etapa3.style.display = 'block';
+            cambioColorMenuSuperior('TerceraParte');
+
+            console.log(datosBitacoraMateriales);
+        });
+
+        // RETROCEDER A ETAPA 1 
+        const boton4 = document.getElementById('nav-4');
+        boton4.addEventListener('click', () => {
+            etapa2.style.display = 'none';
+            etapa1.style.display = 'block';
+            cambioColorMenuSuperior('primeraParte');
+        });
+
+        // RETROCEDER A ETAPA 2 
+        const boton5 = document.getElementById('nav-5');
+        boton5.addEventListener('click', () => {
+            etapa3.style.display = 'none';
+            etapa2.style.display = 'block';
+            cambioColorMenuSuperior('segundaParte');
+        });
+    }
+    // ¡Nota que toda la lógica de "btnPlus.addEventListener..." que estaba aquí fue eliminada!
+}
+
+
+//FUNCION PARA MAPEAR EL RESUMEN
+
+function generarResumen() {
+    const contenedorMaterial = document.getElementById('materiales-info');
+    const contenedorBitacora = document.getElementById('bitacora-info');
+
+    contenedorMaterial.innerHTML = `
+        <h4>Material Seleccionado</h4>
+        <p><strong>Nombre:</strong> ${datosBitacoraMateriales.nombreMaterial}</p>
+        <p><strong>ID:</strong> ${datosBitacoraMateriales.idMaterial}</p>
+        <p><strong>Cantidad Solicitada:</strong> ${datosBitacoraMateriales.cantidad}</p>
+    `;
+
+    contenedorBitacora.innerHTML = `
+        <h4>Detalles de la Bitácora</h4>
+        <p><strong>Profesor:</strong> ${datosBitacoraMateriales.maestro}</p>
+        <p><strong>Tipo:</strong> ${datosBitacoraMateriales.tipoBitacora}</p>
+        <p><strong>Descripción:</strong> ${datosBitacoraMateriales.descripcion}</p>
+    `;
+}
+
+
+async function cargarMat() {
+    const IdEnUso = obtenerIdLab();
+
+    try {
+        const respuesta = await fetch(`http://localhost:5000/api/materiales/laboratorio/${IdEnUso}`); // Ruta que trae todas
+        const materiales = await respuesta.json();
+
+        if (respuesta.ok) {//si el servidor no obtiene nada va colocar un mensaje en la pantalla de que el id no fue encontrado
+            return materiales;
+        }
+
+
+    } catch (error) {
+        console.error("Error al cargar IDs:", error);
+    }
+}
+
+async function cargarComboMateriales(tipo) {
+    const IdEnUso = obtenerIdLab();
+    const select = document.getElementById('select-ids');
+    const materiales = await cargarMat();
+    select.innerHTML = '<option value="">Seleccione un Material</option>';
+
+    // Creamos una opción por cada editorial
+    materiales.forEach(ed => {
+        const opcion = document.createElement('option');
+        opcion.value = ed.IdMaterial; // El valor que se envía a Python
+        opcion.textContent = `ID: ${ed.IdMaterial} - ${ed.Nombre_Material}`; // Lo que ve el usuario
+        select.appendChild(opcion);
+    });
+
+    if (tipo === 'editar') {
+
+        select.value = datosBitacoraMateriales.idMaterial;
+        cargarInfoMateriales(datosBitacoraMateriales.idMaterial);
+    }
+
+
+    select.addEventListener('change', (e) => {
+        const idSeleccionado = e.target.value;
+        const materialEncontrado = materiales.find(ed => ed.IdMaterial == idSeleccionado);
+
+        if (materialEncontrado) {
+            datosBitacoraMateriales.nombreMaterial = materialEncontrado.Nombre_Material; // Guardamos el nombre comercial en memoria
+            cargarInfoMateriales(materialEncontrado.IdMaterial);
+        } else {
+            document.getElementById('cargar-Material').innerHTML = '';
+        }
+    });
+
+}
+
+async function cargarInfoMateriales(idMaterial) {
+    const idActual = obtenerIdLab();
+    const contenedor = document.getElementById('cargar-Material');
+    try {
+        const respuesta = await fetch(`http://localhost:5000/api/materiales/laboratorio/${idActual}/${idMaterial}`); // Ruta que trae todas
+        const materiales = await respuesta.json();
+
+        if (respuesta.ok) {//si el servidor no obtiene nada va colocar un mensaje en la pantalla de que el id no fue encontrado
+            const m = Array.isArray(materiales) ? materiales[0] : materiales;
+            if (m) {
+                contenedor.innerHTML = `
+                    <div class="card-material">
+                        <p><strong>ID:</strong> ${m.IdMaterial}</p>
+                        <h2>${m.Nombre_Material}</h2>
+                        <div class="field">
+                            <label>Cantidad:</label>
+                            <div class="stepper-container">
+                                <button type="button" class="btn-step" onclick="cambiarCantidad('restar')" style="width: 30px; cursor: pointer;">-</button>
+                                <input type="number" id="display-cantidad" name="cantidad" value="${datosBitacoraMateriales.cantidad || 1}" min="1" readonly>
+                                <button type="button" class="btn-step" onclick="cambiarCantidad('sumar')" style="width: 30px; cursor: pointer;">+</button>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+            } else {
+                contenedor.innerHTML = '<p>No se encontró información de este material.</p>';
+            }
+        }
+
+    } catch (error) {
+        console.error("Error al cargar IDs:", error);
+    }
+}
+
+
+function cambiarCantidad(operacion) {
+    const inputCantidad = document.getElementById('display-cantidad');
+    if (!inputCantidad) return;
+
+    let valorActual = parseInt(inputCantidad.value);
+
+    if (operacion === 'sumar') {
+        valorActual += 1;
+    } else if (operacion === 'restar' && valorActual > 1) {
+        valorActual -= 1;
+    }
+
+    inputCantidad.value = valorActual;
+    datosBitacoraMateriales.cantidad = valorActual;
+}
+
+function cambioColorMenuSuperior(id) {
+    const circulo1 = document.getElementById('c-ventana1');
+    const circulo2 = document.getElementById('c-ventana2');
+    const circulo3 = document.getElementById('c-ventana3');
+
+    const icono1 = document.getElementById('icono-v1');
+    const icono2 = document.getElementById('icono-v2');
+    const icono3 = document.getElementById('icono-v3');
+
+    const colorActivo = '#6a1b9a';
+    const colorApagado = '#ccc';
+
+    if (id === 'primeraParte') {
+        // Círculo 1 activo (crece), sin palomita
+        circulo1.style.backgroundColor = colorActivo;
+        circulo1.classList.add('activo');
+        icono1.classList.remove('mostrar');
+
+        // Círculo 2 apagado
+        circulo2.style.backgroundColor = colorApagado;
+        circulo2.classList.remove('activo');
+        icono2.classList.remove('mostrar');
+
+        // Círculo 3 apagado
+        circulo3.style.backgroundColor = colorApagado;
+        circulo3.classList.remove('activo');
+        icono3.classList.remove('mostrar');
+    }
+    else if (id === 'segundaParte') {
+        // Círculo 1 completado (mantiene color y activa palomita con fade-in)
+        circulo1.style.backgroundColor = colorActivo;
+        circulo1.classList.remove('activo');
+        icono1.classList.add('mostrar');
+
+        // Círculo 2 activo (crece), sin palomita aún
+        circulo2.style.backgroundColor = colorActivo;
+        circulo2.classList.add('activo');
+        icono2.classList.remove('mostrar');
+
+        // Círculo 3 apagado
+        circulo3.style.backgroundColor = colorApagado;
+        circulo3.classList.remove('activo');
+        icono3.classList.remove('mostrar');
+    }
+    else if (id === 'TerceraParte') {
+        // Círculos 1 y 2 completados con sus palomitas puestas
+        circulo1.style.backgroundColor = colorActivo;
+        circulo1.classList.remove('activo');
+        icono1.classList.add('mostrar');
+
+        circulo2.style.backgroundColor = colorActivo;
+        circulo2.classList.remove('activo');
+        icono2.classList.add('mostrar');
+
+        // Círculo 3 activo (crece)
+        circulo3.style.backgroundColor = colorActivo;
+        circulo3.classList.add('activo');
+        icono3.classList.remove('mostrar');
+    }
+
+    // Volvemos a inicializar los iconos por si Lucide necesita re-renderizar
+    lucide.createIcons();
+}
+
+const contenedorForms = document.getElementById('Form-bitacoras');
+contenedorForms.addEventListener('submit', async (e) => {//Se coloca un lsitener para detectar que formulario esta activo dentro del contenedor
+    e.preventDefault(); // Detenemos la recarga de página
+    const idLabActual = obtenerIdLab();
+
+    const tipo = datosBitacoraMateriales.tipoBitacora;
+    let almcTipo = 0;
+    if (tipo == "Entrada") {
+        almcTipo = 1;
+    }
+
+    const datosEnviar = {
+        "Descripcion": datosBitacoraMateriales.descripcion,
+        "Tipo": almcTipo,
+        "Cantidad": datosBitacoraMateriales.cantidad,
+        "Exp_Maestro": datosBitacoraMateriales.maestro,
+        "IdLaboratorio": idLabActual,
+        "IdMaterial": datosBitacoraMateriales.idMaterial
+    };
+
+    // Definimos la URL según el formulario
+    let url = 'http://127.0.0.1:5000/bitacora/materiales';
+    let metodo = 'POST'; // Por defecto para agregar
+
+    const esEditar = document.getElementById('botonC-editar');
+
+    if (esEditar) {
+
+        metodo = 'PUT';
+
+        url = `http://127.0.0.1:5000/bitacora/atualizar/materiales/${datosBitacoraMateriales.idBitacora}`;
+    }
+
+    try {
+        const respuesta = await fetch(url, {
+            method: metodo,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datosEnviar)
+        });
+
+        const resultado = await respuesta.json();
+        if (respuesta.ok) {
+            const mensaje = resultado.mensaje || "Operación exitosa";
+
+            // Usamos .then() para esperar a que el usuario cierre la alerta
+            Swal.fire({
+                title: '¡Éxito!',
+                text: mensaje,
+                icon: 'success',
+                confirmButtonColor: '#8b5a96',
+                zIndex: 99999
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.reload(); // Recarga solo tras confirmar
+                }
+            });
+
+        } else {
+            const mensajeAl = resultado.error || "Ocurrió un problema";
+
+            Swal.fire({
+                title: 'Error',
+                text: `Detalle: ${mensajeAl}`,
+                icon: 'error',
+                confirmButtonColor: '#8b5a96',
+                zIndex: 99999
+            });
+        }
+
+    } catch (error) {
+        console.error("Error en la petición:", error);
+    }
+});
+
+
+//-------------------------SECCION DESTINADA A LA ELIMINACION DE LAS INCIDENCIAS-----------------------------------------------------------------------------------
+async function eliminarBitacoraMaterial(id) {//Metodo para eliminar una incidencia desde un boton que se encuentra en las cards
+    const result = await Swal.fire({//Formato para avisar al usuario si esta seguro de eliminar la incidencia
+        title: '¿Seguro que quieres eliminar esta incidencia?',
         text: 'Esta acción no se puede deshacer',
         icon: 'warning',
         width: '280px',
@@ -243,15 +836,15 @@ async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boto
 
         try {
             const response = await fetch(
-                `http://127.0.0.1:5000/ventas/${id}`,//Hace la solicitus por medio del edpoint de eliminar venta
+                `http://127.0.0.1:5000/api/bitacoras/materiales/eliminar/${id}`,//Hace la solicitus por medio del edpoint de eliminar incidencia
                 {
                     method: 'DELETE'//En el metodo de delete
                 }
             );
             if (response.ok) {//Si la operacion se realizo con exito 
-                await Swal.fire({//Devuelve una alerta de que la venta se borro correctamente
-                    title: '¡Venta eliminada!',
-                    text: 'La venta se eliminó correctamente',
+                await Swal.fire({//Devuelve una alerta de que la incidencia se borro correctamente
+                    title: '¡Incidencia eliminada!',
+                    text: 'La Bitacora se eliminó correctamente',
                     icon: 'success',
                     width: '280px',
 
@@ -259,10 +852,10 @@ async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boto
                     confirmButtonColor: '#855597'
                 });
                 location.reload();//Recarga la pagina
-            } else {//Si no es exitoso devuelce una alerta avisando al usuario que no se pude eliminar la venta
+            } else {//Si no es exitoso devuelce una alerta avisando al usuario que no se pude eliminar la incidencia
                 await Swal.fire({
                     title: 'Error',
-                    text: 'No se pudo eliminar la venta',
+                    text: 'No se pudo eliminar la Bitacora',
                     icon: 'error',
                     width: '280px',
 
@@ -272,11 +865,11 @@ async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boto
             }
         } catch (error) {
 
-            console.error('Error al eliminar venta:', error);
+            console.error('Error al eliminar Bitacora:', error);
 
             await Swal.fire({
                 title: 'Error',
-                text: 'Ocurrió un error al eliminar la venta',
+                text: 'Ocurrió un error al eliminar la Bitacora',
                 icon: 'error',
                 width: '280px',
                 confirmButtonText: 'OK',
@@ -286,7 +879,7 @@ async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boto
     } else {
         await Swal.fire({
             title: 'Cancelado',
-            text: 'La venta no fue eliminada',
+            text: 'La Bitacora no fue eliminada',
             icon: 'info',
             width: '280px',
             confirmButtonText: 'OK',
@@ -295,598 +888,50 @@ async function eliminarVenta(id) {//Metodo para eliminar una venta desde un boto
     }
 }
 
-/*------SECCION DESTINANDA A LO RELACIONADO CON EL MODAL DE ACTUALIZAR VENTA-----------------------------*/
-const buscarManga = document.getElementById('search-manga');
-const btnBuscarManga = document.getElementById('btn-search-manga');
-const CampoNombre = document.getElementById('display-nombre');
-const CampoPrecio = document.getElementById('display-precio');
-const CampoStock = document.getElementById('display-stock');
-const imagenManga = document.getElementById('imagen-manga');
-
-async function buscarMangaPorNombre() {//Funcion para buscar manga por nombre 
-    console.log('Buscando manga...');
-    const nombreBusqueda = buscarManga.value.trim();//obtiene el valor del input asociado a ese id y le quita los espacios
-    console.log('Nombre ingresado:', nombreBusqueda);
-
-    try {
-        const respuesta = await fetch(`http://127.0.0.1:5000/mangas/${nombreBusqueda}`);//Hace la peticion a la api
-        const manga = await respuesta.json();
-        console.log('Respuesta del servidor:', manga);
-        const rutaPortada = manga[0].url_imagen ? manga[0].url_imagen : 'img/default.png';//ruta de la portada del manga por default
-
-
-        if (Array.isArray(manga) && manga.length > 0) {
-            CampoNombre.value = manga[0].titulo;//Asigna el valor del titulo del manga que esta trayendo de la base de datos al input asociado al id del campo nombre
-            console.log('Titulo del manga:', manga[0].titulo);
-            CampoPrecio.value = `$${manga[0].precio}`;//Asigna el precio
-            CampoStock.value = manga[0].stock;//Asigna el stock
-            imagenManga.innerHTML = `<img src="../catalogomangas/${rutaPortada}" alt="${manga[0].titulo}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px;" onerror="this.src='../catalogomangas/img/default.png'">`;
-            //Asigna la portada de la imagen
-        } else {
-            //En caso de que no encuentre el manga va dejar los valores de los campos con algo distinto
-            imagenManga.innerHTML = `<img src="../catalogomangas/img/default.png" alt="Manga no encontrado" style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px;">`;//Asigna una imagen por default al no encontrar el manga
-            CampoNombre.value = "No encontrado";//Asigna "no encontrado" al input de titulo
-            //Deja en 0 tanto el precio como el stock
-            CampoPrecio.value = "$0.00";
-            CampoStock.value = "0";
-        }
-        return manga;
-
-
-    } catch (error) {
-        console.error("Error:", error);
-        return null;
-    }
-}
-
-// Evento para presionar Enter
-//al detectar el evento realiza la busqueda del manga por medio del nombre
-buscarManga.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        buscarMangaPorNombre();
-    }
-});
-
-// Evento para clic en la lupa
-btnBuscarManga.addEventListener('click', buscarMangaPorNombre);
-
-
-//funcion para cargar los mangas al darle visualizar productos
-const VisualizarMangas = document.getElementById('btn-visualizar-mangas');
-
-async function cargarMangas() {
-    try {
-        // Llamada al endpoint que ya incluye el LEFT JOIN con manga_imagenes
-        const response = await fetch('http://127.0.0.1:5000/mangas');
-        const mangas = await response.json();
-
-        const container = document.getElementById('mangas-list-container');
-
-        // Generar las tarjetas dinámicamente
-        mangas.forEach(m => {
-            const card = document.createElement('div');
-            card.className = 'manga-card';
-
-            //si la BD no tiene url_imagen, usa una por defecto
-            const rutaPortada = m.url_imagen ? m.url_imagen : 'img/default.png';
-
-
-            // Construir el HTML de la tarjeta con los datos del manga
-            card.innerHTML = `
-                <div class="card-top">
-                    <span class="id-badge">${m.id}</span>   
-                    <span class="editorial-label">Editorial ${m.id_editorial}</span>
-                    <img src="../catalogomangas/${rutaPortada}" 
-                         class="mangacard-img" 
-                         alt="Portada de ${m.titulo}"
-                         onerror="this.src='../catalogomangas/img/default.png'">
-                    <span class="stock-label"> <i data-lucide="package"></i> ${m.stock} Disponible/s  </span>
-
-                </div>
-                <div class="manga-info">
-                    <h3>${m.titulo} </h3>
-                    <p>${m.autor}</p>
-                    <div class="price-tag">
-                        <i data-lucide="dollar-sign"></i>
-                        <span>$${m.precio.toFixed(2)}</span>
-                    </div>
-                </div>
-            `;
-
-            // --- NUEVO: Evento para llenar los campos al hacer clic ---
-            card.addEventListener('click', () => {
-                //  Llenar Nombre del Producto (Título + Volumen)
-                document.getElementById('display-nombre').value = `${m.titulo} `;
-
-                //  Llenar Valor Ponderado (Precio)
-                document.getElementById('display-precio').value = `$${m.precio.toFixed(2)}`;
-
-                //  Llenar Stock Disponible
-                document.getElementById('display-stock').value = m.stock;
-
-                //  Actualizar la imagen del placeholder 
-                const previewImg = document.querySelector('.image-placeholder');
-                previewImg.innerHTML = `<img src="../catalogomangas/${rutaPortada}" 
-                                     style="width: 100%; height: 100%; object-fit: scale-down; "
-                                     onerror="this.src='../catalogomangas/img/default.png'">`;
-
-                // 5. Resetear cantidad a 1 al seleccionar nuevo producto
-                document.getElementById('display-cantidad').value = 1;
-            });
-            container.appendChild(card);
-        });
-
-        // Refrescar iconos para las nuevas tarjetas inyectadas
-        lucide.createIcons();
-
-    } catch (error) {
-        console.error("Error al conectar con la API de MangaStore:", error);
-    }
-}
-VisualizarMangas.addEventListener('click', cargarMangas);
-
-
-const btnMinus = document.getElementById('btn-minus');
-const btnPlus = document.getElementById('btn-plus');
-const inputCantidad = document.getElementById('display-cantidad');
-
-// Evento para aumentar
-btnPlus.addEventListener('click', () => {
-    let valorActual = parseInt(inputCantidad.value);
-    inputCantidad.value = valorActual + 1;
-});
-
-// Evento para disminuir
-btnMinus.addEventListener('click', () => {
-    let valorActual = parseInt(inputCantidad.value);
-    // Evitamos que sea menor a 1
-    if (valorActual > 1) {
-        inputCantidad.value = valorActual - 1;
-    }
-});
-
-
-//SECCION DE LA LOGICA PARA EL FUNCIONAMIENTO DEL MODAL 
-//Obetener el id
-async function obtenerId(nombre) {
-    try {
-        const respuesta = await fetch(`http://127.0.0.1:5000/mangas/${nombre}`);
-        if (!respuesta.ok) {
-            console.log('Manga no encontrado');
-            return null;
-        }
-        const manga = await respuesta.json();
-        if (Array.isArray(manga) && manga.length > 0) {
-            console.log('ID del primer manga:', manga[0].id);
-            return manga[0].id;
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        return null;
-    }
-
-}
-//Funcion para calcular los totales de la venta , se llama cada que se agrega un producto a la tabla o se elimina
-function calculoTotales() {
-    console.log('Holi');
-    const filas = document.querySelectorAll('#cart-items tr');
-    let subtotal = 0;
-
-    filas.forEach(fila => {
-        // Obtenemos precio y cantidad de las celdas (ajusta el índice si es necesario)
-        const cantidad = parseFloat(fila.cells[2].innerText) || 0;
-        const precioText = fila.cells[3].innerText;
-        const precio = parseFloat(
-            precioText.replace('$', '').trim()
-        ) || 0;
-        subtotal += cantidad * precio;
-        console.log(cantidad, precio);
-    });
-
-
-
-    const impuestoReal = subtotal * 0.16;
-    const impuesto = impuestoReal; // Ejemplo 16%
-    const subtotalFinal = subtotal - impuestoReal;
-    const descuento = subtotal > 1000 ? 50 : 0; // Ejemplo: $50 si es > 1000
-    const total = subtotal - descuento;
-
-
-    // Actualizar el HTML que pasaste
-    document.querySelector('.totals-section p:nth-child(1) span').innerText = `$ ${subtotalFinal.toFixed(2)}`;
-    document.querySelector('.totals-section p:nth-child(2) span').innerText = `$ ${impuesto.toFixed(2)}`;
-    document.querySelector('.totals-section p:nth-child(3) span').innerText = `$ ${descuento.toFixed(2)}`;
-    document.querySelector('.final-total span').innerText = `$ ${total.toFixed(2)}`;
-
-    return { subtotal, impuesto, descuento, total };
-
-
-}
-//Funcion para cargar los datos del producto a la tabla del carrito cada que se le da click al boton de agregar producto
-const matchProductos = document.getElementById('btn-agregar-producto');
-async function cargarDatosTabla() {
-    console.log('Agregando producto a la tabla...');
-    const nombre = document.getElementById('display-nombre').value.trim();
-    const id = await obtenerId(nombre);
-    const precio = document.getElementById('display-precio').value;
-    const cantidad = parseInt(
-        document.getElementById('display-cantidad').value
-    );
-    const stock = parseInt(
-        document.getElementById('display-stock').value
-    );
-
-    const tbody = document.getElementById('cart-items');
-    if (!id) {
-        Swal.fire('Advertencia', 'Debe seleccionar un producto', 'warning');
-        return;
-    }
-    if (!cantidad || cantidad <= 0) {
-        Swal.fire('Advertencia', 'Ingrese una cantidad valida', 'warning');
-        return;
-    }
-
-    if (cantidad > stock) {
-        Swal.fire('Error', 'No hay stock suficiente', 'error');
-        return;
-    }
-
-    let cantidadEnTabla = 0;
-
-    const filas = document.querySelectorAll('#cart-items tr');
-
-    filas.forEach(fila => {
-
-        const idTabla = parseInt(fila.cells[0].innerText);
-
-        const cantidadTabla = parseInt(fila.cells[2].innerText);
-
-        // Si es el mismo manga
-        if (idTabla === id) {
-            cantidadEnTabla += cantidadTabla;
-        }
-
-    });
-
-    const totalSolicitado = cantidadEnTabla + cantidad;
-
-    if (totalSolicitado > stock) {
-
-        Swal.fire('Error', `Stock insuficiente. Disponible: ${stock - cantidadEnTabla}`, 'error');
-
-        return;
-    }
-    const bloque = {
-        id, nombre, cantidad, precio
-    }
-    console.log(bloque);
-    const fila = document.createElement('tr');
-
-    fila.innerHTML = `
-        <td>${bloque.id}</td>
-        <td>${bloque.nombre}</td>
-        <td>${bloque.cantidad}</td>
-        <td>${bloque.precio}</td>
-        <td>
-              <span class="btn-eliminar-tabla">&times;</span>
-        </td>
-
-    `;
-    //Evento para eliminar la fila del producto agregado a la tabla del carrito
-    const btnEliminar = fila.querySelector('.btn-eliminar-tabla');
-    btnEliminar.addEventListener('click', () => {
-        console.log(btnEliminar)
-        fila.remove();
-
-        calculoTotales();
-    });
-
-    tbody.appendChild(fila);
-    calculoTotales();
-
-
-}
-//Evento para cargar los datos del producto a la tabla del carrito cada que se le da click al boton de agregar producto
-matchProductos.addEventListener('click', cargarDatosTabla);
-
-//Funcion para limpiar el formulario cada que se le da click al boton de limpiar formulario
-function limpiarForm() {
-    const buscarManga = document.getElementById('search-manga');
-    const CampoNombre = document.getElementById('display-nombre');
-    const CampoPrecio = document.getElementById('display-precio');
-    const CampoStock = document.getElementById('display-stock');
-    const imagenManga = document.getElementById('imagen-manga');
-
-
-    buscarManga.innerHTML = "";
-    imagenManga.innerHTML = `<i data-lucide="package-open"></i>`;
-    lucide.createIcons(); // Esto busca nuevos elementos y los dibuja
-    CampoNombre.value = "";
-    CampoPrecio.value = "$0.00";
-    CampoStock.value = "0";
-
-}
-//Evento para limpiar el formulario cada que se le da click al boton de limpiar formulario
-const limpiar = document.getElementById('limpiar-tabla');
-function limpiarTabla() {
-    const tbody = document.getElementById('cart-items');
-    tbody.innerHTML = '';
-    calculoTotales();
-
-}
-//Evento para limpiar el formulario cada que se le da click al boton de limpiar formulario
-limpiar.addEventListener('click', limpiarTabla);
-
-//-------------------------------PROCESO DE VENTA
-//SECCION DE LOS CONTENEDORES PARA LOS PROCESOS DE TARJETA 
-//Cierra el modal de donde se encuentra el pago
-function cerrarModalPago() {
-    const modal = document.getElementById('PantallaProceso');
-    modal.style.display = 'none';
-    modal.innerHTML = '';
-}
-//Funcion para mostrar el modal de proceso de pago dependiendo del metodo que se seleccione , ya sea efectivo o tarjeta
-function cardsEfectivoTarjeta(metodo) {
-    const filas = document.querySelectorAll('#cart-items tr');
-
-    if (filas.length === 0) {
-        Swal.fire('Advertencia', 'Debe agregar productos al carrito', 'warning');
-        return;
-    }
-    const contenedor = document.getElementById('PantallaProceso');
-
-    const totalTexto = document.querySelector('.final-total span')
-        .innerText;
-
-    const total = parseFloat(
-        totalTexto.replace('$', '').trim()
-    );
-    //SECCION DE TARJETA EN LOS FORMS
-    if (metodo == 'Tarjeta') {
-        contenedor.style.display = "flex";
-        contenedor.innerHTML = `
-            <div class="modal-pago animate-pop">
-                <span class="btn-cerrar">&times;</span>
-                <h3>Procesando Tarjeta</h3>
-                <div class="total-pago">
-                    <span>Total a pagar</span>
-                    <h2>$${total.toFixed(2)}</h2>
-                </div>
-                <button type="submit" id="tarjeta-proceso">
-                    Procesar Tarjeta
-                </button>
-
-            </div>
-        `;
-        const btnCerrar = contenedor.querySelector('.btn-cerrar');
-        btnCerrar.addEventListener('click', () => {
-            contenedor.style.display = "none";
-        });
-
-        const procesoCard = document.getElementById('tarjeta-proceso');
-        procesoCard.addEventListener('click', () => {
-            procesarVenta('Tarjeta');
-        });
-        //SECCION DE EFECTIVO EN LOS FORMS 
-    } else if (metodo == 'Efectivo') {
-        console.log('2');
-        contenedor.style.display = "flex";
-        contenedor.innerHTML = `
-            <div class = "modal-pago animate-pop">
-                <span class="btn-cerrar">&times;</span>
-                <h3>Efectivo:</h3>'
-                <p>Total: $${total.toFixed(2)}</p>
-                <label>Ingrese el monto:</label>
-                <input type="number" id="efectivo">
-
-                <button id="btn-calcular" type="submit">
-                    Calcular Cambio
-                </button>
-                <div id = "Cambio">
-
-                </div>
-            </div>
-        `;
-
-        const btnCerrar = contenedor.querySelector('.btn-cerrar');
-        btnCerrar.addEventListener('click', () => {
-            contenedor.style.display = "none";
-        });
-        const procesoCash = document.getElementById('btn-calcular');
-        procesoCash.addEventListener('click', () => {
-            // console.log('Tarjeta')
-            vuelto(total);
-        });
-
-    }
-}
-
-//CALCULAR EL VUELTO EN CASO DE QUE EL METODO DE PAGO SEA EFECTIVO
-function vuelto(total) {
-    const efectivo1 = document.getElementById('efectivo');
-    const efectivo = parseInt(efectivo1.value);
-
-    const vueltoDiv = document.getElementById('Cambio');
-    if (!efectivo || efectivo <= 0) {
-        Swal.fire({
-            title: 'Error',
-            text: 'Debe ingresar una cantidad válida',
-            icon: 'error',
-            zIndex: 99999
-        });
-        return;
-    }
-    if (efectivo < total) {
-        vueltoDiv.innerHTML = `<p>Falta efectivo</p>`;
-
-        return;
-    }
-    const calcVuelto = efectivo - total;
-    vueltoDiv.innerHTML = `
-        <p>Su cambio es: $${calcVuelto.toFixed(2)}</p>
-        <button id= "finalizarProp" type="submit">Procesar Pago</button>
-    `;
-    const cashFinal = document.getElementById('finalizarProp');
-    cashFinal.addEventListener('click', () => {
-        procesarVenta('Efectivo');
-    });
-
-}
-
-//Funcion para cargar los datos de la venta al modal de actualizar venta cada que se le da click al boton de actualizar venta
-async function actualizarVenta(venta) {
-    const modal = document.getElementById('modal-venta');
-    modal.style.display = 'flex';
-
-    const tbody = document.getElementById('cart-items');
-    tbody.innerHTML = '';
-
-    // Usamos map para crear una lista de promesas de búsqueda
-    const promesasArticulos = venta.articulos.map(async (art) => {
-        // Si el artículo no tiene ID, lo buscamos por nombre
-        let idReal = art.manga_id;
-
-        if (!idReal) {
-            console.log(`Buscando ID para: ${art.manga}`);
-            idReal = await obtenerId(art.manga);
-        }
-
-        return {
-            ...art,
-            manga_id: idReal || 'S/N' // Asignamos el ID obtenido o S/N
-        };
-    });
-
-    // Esperamos a que todas las búsquedas terminen
-    const articulosConId = await Promise.all(promesasArticulos);
-
-    // Ahora mapeamos en la tabla
-    articulosConId.forEach(art => {
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td>${art.manga_id}</td>
-            <td>${art.manga}</td>
-            <td>${art.cantidad}</td>
-            <td>$${art.precio_unitario}</td>
-            <td>
-                <span class="btn-eliminar-tabla">&times;</span>
-            </td>
-        `;
-
-        fila.querySelector('.btn-eliminar-tabla').addEventListener('click', () => {
-            fila.remove();
-            calculoTotales();
-        });
-
-        tbody.appendChild(fila);
-    });
-
-    calculoTotales();
-    modal.dataset.ventaId = venta.id_venta;
-    modal.dataset.modo = 'update';
-}
-//Funcion para procesar el pago de la venta , se llama cada que se le da click al boton de procesar pago en el modal de proceso de pago
-async function procesarVenta(metodoPago) {
-    const modal = document.getElementById('modal-venta');
-    const id = modal?.dataset?.ventaId;
-    const filas = document.querySelectorAll('#cart-items tr');
-    if (filas.length === 0) {
-        Swal.fire('Error', 'No hay productos en la venta', 'error');
-        return;
-    }
-    const productos = [];
-    filas.forEach(fila => {
-        const manga_id = parseInt(fila.cells[0].innerText);
-        const cantidad = parseInt(fila.cells[2].innerText);
-        if (!manga_id || !cantidad) return;
-        productos.push({ manga_id, cantidad });
-    });
-
-    if (productos.length === 0) {
-        Swal.fire('Error', 'Productos inválidos', 'error');
-        return;
-    }
-
-    const datos = {
-        productos,
-        metodo_pago: metodoPago
-    };
-
-    try {
-        const res = await fetch(`http://127.0.0.1:5000/ventas/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datos)
-        });
-
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok) {
-            Swal.fire('Error', data.error || 'Error al actualizar venta', 'error');
-            return;
-        }
-        await Swal.fire({
-            title: 'Éxito',
-            text: 'Pago procesado correctamente',
-            icon: 'success'
-        });
-        // Limpieza
-        cerrarModalPago();
-        limpiarTabla();
-        limpiarForm();
-        location.reload();
-
-    } catch (error) {
-        console.error("Error PUT venta:", error);
-        Swal.fire('Error', 'Error de conexión con el servidor', 'error');
-    }
-}
-//Funcion para limpiar el modal de actualizar venta cada que se le da click al boton de cerrar modal o al finalizar la venta
-function limpiarVentaModal() {
-    // Inputs de búsqueda y producto
-    document.getElementById('search-manga').value = '';
-    document.getElementById('display-nombre').value = '';
-    document.getElementById('display-precio').value = '$0.00';
-    document.getElementById('display-stock').value = '';
-    document.getElementById('display-cantidad').value = 1;
-
-    // Imagen del producto
-    const imagen = document.getElementById('imagen-manga');
-    imagen.innerHTML = '<i data-lucide="package-open"></i>';
-
-    // Carrito
-    document.getElementById('cart-items').innerHTML = '';
-
-    // Totales (reinicio visual)
-    document.querySelector('.totals-section').innerHTML = `
-        <p>SUBTOTAL <span>$ 00.00</span></p>
-        <p>IMPUESTO <span>$ 00.00</span></p>
-        <p>DESCUENTO <span>$ 00.00</span></p>
-        <h3 class="final-total">TOTAL <span>$ 00.00</span></h3>
-    `;
-}
-const modal = document.getElementById("modal-venta");
-const btnCerrar = document.querySelector(".close-modal");
-//Evento para cerrar el modal de actualizar venta cada que se le da click al boton de cerrar modal o al finalizar la venta
-btnCerrar.addEventListener("click", async () => {
-
-    const result = await Swal.fire({
-        title: '¿Cerrar venta?',
-        text: 'Se perderán los datos actuales',
-        icon: 'warning',
+//CERRAR SESION
+function cerrarSesion() {
+    Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: 'Tendrás que ingresar tus credenciales nuevamente para acceder.',
+        icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Sí, cerrar',
+        confirmButtonColor: '#8b5a96',
+        cancelButtonColor: '#bfaec6',
+        confirmButtonText: 'Sí, salir',
         cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#855597',
-        cancelButtonColor: '#d33'
-    });
+        zIndex: 999999
+    }).then((result) => {
+        if (result.isConfirmed) {
 
-    if (result.isConfirmed) {
-        modal.style.display = "none";
-        limpiarVentaModal();
+            sessionStorage.removeItem("idLaboratorio");
+            sessionStorage.removeItem("nombreUsuario");
+
+            window.location.href = "../login.html";
+        }
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    obtenerIdLab();
+    const nombreUsuario = obtenerNombreUsuario();
+
+    const elementoHeader = document.getElementById('txt-usuario-header');
+    if (elementoHeader) {
+        elementoHeader.textContent = nombreUsuario;
     }
+
+
+    const btnSalir = document.getElementById('btn-cerrar-sesion');
+    if (btnSalir) {
+        btnSalir.addEventListener('click', cerrarSesion);
+    }
+
+
+    configurarBotonAdd();
+    lucide.createIcons();
+    cargarMaterial();
 });
+
 
 

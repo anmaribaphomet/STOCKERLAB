@@ -103,7 +103,7 @@ body {
 /*------------ ESTILO DEDICADO A INCIDENCIAS--------------- */
 
 /*--------------BUSCADOR DE INCIDENCIAS--------------------*/
-.buscador-incidencias {
+.buscador-bitacoras {
     background: white;
     border-radius: 20px;
     padding: 5px 15px;
@@ -178,7 +178,7 @@ body {
 }
 
 /*--------SECCION DEL CUERPO DONDE APARECEN LOS REGISTROS------------------*/
-.content-incidencias-p {
+.content-bitacoras-p {
     width: 100%;
     max-width: 1200px;
     padding: 30px;
@@ -191,7 +191,7 @@ body {
     border-radius: 20px;
 }
 
-#contenedor-incidencias {
+#contenedor-bitacoras {
     display: flex;
     flex-direction: column;
     grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
@@ -203,7 +203,7 @@ body {
     /* Centra verticalmente las cards dentro del contenedor */
 }
 
-.incidencia-card {
+.bitacoras-card {
     position: relative;
     width: 90%;
     background: var(--base);
@@ -217,29 +217,29 @@ body {
 
 }
 
-.incidencia-card:hover {
+.bitacoras-card:hover {
     transform: translateY(-4px);
 }
 
-.incidencia-header {
+.bitacoras-header {
     display: flex;
     justify-content: space-between;
     align-items: left;
     margin-bottom: 15px;
 }
 
-.incidencia-header h3 {
+.bitacoras-header h3 {
     margin: 0;
     font-size: 18px;
 }
 
-.incidencia-header p {
+.bitacoras-header p {
     margin: 5px 0 0;
     color: #777;
     font-size: 13px;
 }
 
-.incidencia-descripcion {
+.bitacoras-descripcion {
     background: var(--purple);
     color: white;
     padding: 10px 14px;
@@ -248,7 +248,7 @@ body {
     font-size: 16px;
 }
 
-.incidencia-body {
+.bitacoras-body {
     margin-bottom: 15px;
     font-size: 14px;
 }
@@ -326,7 +326,7 @@ body {
     transform: translateY(-2px);
 }
 
-.incidencia-card {
+.bitacoras-card {
     position: relative;
 }
 
@@ -378,20 +378,40 @@ body {
     stroke-width: 2.5;
 }
 
-/*-----------FORM PARA INCIDENCIAS-------------------------*/
+/*-----------FORM PARA MATERIALES-------------------------*/
+#Form-bitacoras.form-overlay {
+    z-index: 500;
+}
+
+.form-overlay {
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(5px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 2000;
+
+}
+
 .forms {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: white;
-    padding: 50px;
+    padding: 50px 50px 70px 50px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     width: 400px;
 }
 
-.forms h3 {
+.forms h2 {
     margin-top: 0;
     color: #4a3a4d;
     font-size: 1.2rem;
@@ -399,12 +419,19 @@ body {
 }
 
 .forms input[type="text"] {
+    margin-top: 10px;
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #bcabc4;
     border-radius: 10px;
     box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+.forms input[type="text"]:hover {
+    border-color: #8e679c;
+    background-color: #fff;
 }
 
 .forms button[type="submit"] {
@@ -418,7 +445,101 @@ body {
     font-weight: bold;
 }
 
-/* Botón de cerrar (X) */
+/*SECCION DE LOS BOTONES DE NAVEGACION DE LAS ETAPAS*/
+
+#nav-2 {
+    width: 10%;
+    background-color: #8b5a96;
+    color: white;
+    border: none;
+    padding: 10px 5px 10px 5px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+
+}
+
+#nav-2:hover {
+    background: #3f2745;
+    color: white;
+    box-shadow: 0 0 8px rgba(142, 103, 156, 0.3);
+    transition: all 0.2s;
+
+}
+
+#nav-3 {
+    width: 10%;
+    background-color: #8b5a96;
+    color: white;
+    border: none;
+    padding: 10px 5px 10px 5px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    position: absolute;
+    bottom: 10px;
+    right: 40px;
+
+}
+
+#nav-3:hover {
+    background: #3f2745;
+    color: white;
+    box-shadow: 0 0 8px rgba(142, 103, 156, 0.3);
+    transition: all 0.2s;
+
+}
+
+#nav-4 {
+    width: 10%;
+    background-color: #8b5a96;
+    color: white;
+    border: none;
+    padding: 10px 5px 10px 5px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    position: absolute;
+    bottom: 10px;
+    left: 40px;
+
+}
+
+#nav-4:hover {
+    background: #3f2745;
+    color: white;
+    box-shadow: 0 0 8px rgba(142, 103, 156, 0.3);
+    transition: all 0.2s;
+
+}
+
+#nav-5 {
+    width: 10%;
+    background-color: #8b5a96;
+    color: white;
+    border: none;
+    padding: 10px 5px 10px 5px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+
+}
+
+#nav-5:hover {
+    background: #3f2745;
+    color: white;
+    box-shadow: 0 0 8px rgba(142, 103, 156, 0.3);
+    transition: all 0.2s;
+
+}
+
+/*FIN DE LA SECCION DE LOS BOTONES DEL NAV*/
 .btn-cerrar-dinamico {
     position: absolute;
     top: 20px;
@@ -442,6 +563,177 @@ body {
     background: #8b5a96;
     color: white;
     transform: rotate(90deg);
+}
+
+
+select.select-tipo {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    color: #444;
+    background-color: #fdfdfd;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    appearance: none;
+    /* Quita la flecha por defecto en algunos navegadores */
+    -webkit-appearance: none;
+    -moz-appearance: non;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 18px;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+/* Efecto al pasar el mouse */
+select.select-tipo:hover {
+    border-color: #8e679c;
+    background-color: #fff;
+}
+
+/* Efecto cuando el usuario hace clic (Foco) */
+select.select-tipo:focus {
+    outline: none;
+    border-color: #8e679c;
+    box-shadow: 0 0 8px rgba(142, 103, 156, 0.3);
+}
+
+/* Estilo para las opciones dentro del combo */
+select.select-tipo option {
+    padding: 10px;
+    background-color: #fff;
+    color: #333;
+}
+
+.contador {
+    /*background-color: red;*/
+    width: 100%;
+    padding: 0px 10px 0px 10px;
+    /* Activamos Flexbox */
+    display: flex;
+    /* Alinea el círculo, la línea y el otro círculo en una fila horizontal */
+    flex-direction: row;
+    /* Centra todo el grupo horizontalmente en la pantalla */
+    justify-content: center;
+    /* Centra la línea verticalmente respecto a los círculos */
+    align-items: center;
+
+    /* Espaciado opcional entre cada elemento */
+    gap: 10px;
+    box-sizing: border-box;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.cuadros {
+    /*background: rgba(0, 0, 0, 0.45);*/
+    position: relative;
+    width: 25%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.cuadros .texto {
+    color: gray;
+    margin: 0;
+    font-size: 12px;
+    font-style: bold;
+}
+
+
+.circulos {
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    padding: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.linea {
+    position: relative;
+    height: 2px;
+    width: 25%;
+    background-color: var(--subtext);
+}
+
+/* 1. Transición suave para el fondo del círculo */
+.circulos {
+    transition: background-color 0.4s ease, transform 0.3s ease;
+}
+
+/* 2. Efecto de "pulso" o crecimiento cuando el paso se activa */
+.circulos.activo {
+    transform: scale(1.15);
+    /* Crece un poquito para denotar que estás ahí */
+    box-shadow: 0 0 10px rgba(63, 44, 75, 0.4);
+    /* Pequeño brillo púrpura */
+}
+
+/* 3. Animación de entrada para las palomitas (Fade In + un sutil deslizamiento hacia arriba) */
+.icono-check-animado {
+    opacity: 0;
+    transform: translateY(5px) scale(0.5);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Clase que aplicará JS cuando el paso esté completado */
+.icono-check-animado.mostrar {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/*Seccion del div donde se muestra el material seleccionado*/
+
+.card-material {
+    width: 100%;
+    height: auto;
+    background-color: var(--mantle);
+    border-radius: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+.bitacora-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.bitacora-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.bitacora-header p {
+    margin: 5px 0 0;
+    color: #777;
+    font-size: 13px;
+}
+
+.bitacora-descripcion {
+    background: var(--purple);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 16px;
 }
 
 /*aumeNtador a la hora de crear una venta para la cantidad*/
@@ -468,6 +760,7 @@ body {
     border-radius: 15px;
     padding: 10px;
     border: #d8d4d4 solid 1px;
+    background-color: white;
 }
 
 /* incrementandor de cantidad */
@@ -522,64 +815,159 @@ body {
     color: #4c4f69;
 }
 
-
-
-/*SECCION DESTINADA A LOS COMBOS DE LA INTERFAZ*/
-select.select-int {
-    width: 100%;
-    padding: 12px 15px;
-    font-size: 16px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #444;
-    background-color: #fdfdfd;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    appearance: none;
-    /* Quita la flecha por defecto en algunos navegadores */
-    -webkit-appearance: none;
-    -moz-appearance: non;
-    cursor: pointer;
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 18px;
-    transition: all 0.3s ease;
-    margin-bottom: 20px;
-}
-
-/* Efecto al pasar el mouse */
-select.select-int:hover {
-    border-color: #8e679c;
-    background-color: #fff;
-}
-
-/* Efecto cuando el usuario hace clic (Foco) */
-select.select-int:focus {
-    outline: none;
-    border-color: #8e679c;
-    box-shadow: 0 0 8px rgba(142, 103, 156, 0.3);
-}
-
-/* Estilo para las opciones dentro del combo */
-select.select-int option {
-    padding: 10px;
-    background-color: #fff;
-    color: #333;
-}
-
-
 /* -----------------------ANIMACIONES -----------------*/
 @keyframes popIn {
     0% {
-        transform: scale(0.8);
+        /* Mantiene el centrado (-50%) mientras escala a 0.8 y desaparece */
+        transform: translate(-50%, -50%) scale(0.8);
         opacity: 0;
     }
 
     100% {
-        transform: scale(1);
+        /* Mantiene el centrado (-50%) mientras escala a su tamaño real */
+        transform: translate(-50%, -50%) scale(1);
         opacity: 1;
     }
 }
 
-.animate-pop {
-    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* Esta clase debe tener un posicionamiento fijo o absoluto para centrarse en pantalla */
+.forms.animate-pop {
+    position: fixed;
+    /* O 'absolute' si prefieres que se mueva con el scroll */
+    top: 50%;
+    left: 50%;
+    /* Aseguramos que el punto de partida tome en cuenta el centro del formulario */
+    transform: translate(-50%, -50%) scale(1);
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+
+    /* Opcional: Asegúrate de que el formulario esté por encima de otros elementos */
+    z-index: 1000;
+}
+
+/*SALIDA BTN*/
+.btn-exit {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    outline: none;
+}
+
+
+.exit-icon {
+    width: 22px;
+    height: 22px;
+    color: #875498;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+
+.btn-exit:hover {
+    background-color: rgba(135, 84, 152, 0.1);
+
+}
+
+.btn-exit:hover .exit-icon {
+    color: #744484;
+    transform: translateX(2px);
+}
+
+.btn-exit:active {
+    transform: scale(0.92);
+}
+
+/* ESTADO DEL SERVIDOR */
+.server-status-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #fbf9fc;
+    border: 1px solid #e1d4e8;
+    padding: 8px 16px;
+    border-radius: 12px;
+    margin-left: auto;
+    margin-right: 15px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+}
+
+.status-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6a5377;
+    letter-spacing: 0.3px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #bbb0c4;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.status-dot::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    left: 0;
+    top: 0;
+    animation: status-pulse 2s infinite ease-in-out;
+    opacity: 0;
+}
+
+.server-status-box.online {
+    border-color: #d4edd9;
+    background-color: #f4faf6;
+}
+
+.server-status-box.online .status-dot {
+    background-color: #2ecc71;
+}
+
+.server-status-box.online .status-dot::after {
+    background-color: #2ecc71;
+}
+
+.server-status-box.online .status-text {
+    color: #27ae60;
+}
+
+
+.server-status-box.offline {
+    border-color: #f5c6cb;
+    background-color: #fdf3f4;
+}
+
+.server-status-box.offline .status-dot {
+    background-color: #e74c3c;
+}
+
+.server-status-box.offline .status-dot::after {
+    background-color: #e74c3c;
+}
+
+.server-status-box.offline .status-text {
+    color: #c0392b;
+
+}
+
+@keyframes status-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(2.6);
+        opacity: 0;
+    }
 }
