@@ -917,8 +917,8 @@ def obtener_bitacora_incidencias_por_laboratorio(id_lab):
          "cantidad": fila[4],
          "descripcion": fila[5],
          "fecha": fila[6].isoformat() if fila[6] else None,  # Convertimos a formato ISO para JSON
-         "exp_maestro": fila[7],  # Añadimos el campo de experiencia del maestro
-         "exp_alumno": fila[8]  # Añadimos el campo de experiencia del alumno
+         "exp_maestro": fila[7],  
+         "exp_alumno": fila[8]  
        })
         
         conn.close()
@@ -967,8 +967,8 @@ def obtener_bitacora_incidencias_por_incidencia(id_lab, id_inc):
          "cantidad": fila[4],
          "descripcion": fila[5],
          "fecha": fila[6].isoformat() if fila[6] else None,  # Convertimos a formato ISO para JSON
-         "exp_maestro": fila[7],  # Añadimos el campo de experiencia del maestro
-         "exp_alumno": fila[8]  # Añadimos el campo de experiencia del alumno
+         "exp_maestro": fila[7],  
+         "exp_alumno": fila[8]  
        })
         
         conn.close()
@@ -1060,36 +1060,212 @@ def obtener_incidencias_por_alumno(id_lab, exp_alumno):
         conn.rollback()
         conn.close()
         return jsonify({"error": str(e)}), 500
-#AGREGAR NUEVA INCIDENCIA 
+#AGREGAR NUEVA INCIDENCIA A LA BITACORA DE INCIDENCIAS
+@app.route('/api/bitacora/incidencias/laboratorio/<int:id_lab>', methods=['POST'])
+def crear_incidencia_laboratorio(id_lab):
+    try:
+        # Obtenemos los datos enviados desde el frontend en formato JSON
+        datos = request.json
+        
+        if not datos:
+            return jsonify({"error": "No se recibieron datos en la petición"}), 400
+
+        # Extraemos las variables
+        id_material = datos.get('id_material')
+        tipo_texto = datos.get('tipo')
+        cantidad = datos.get('cantidad')
+        descripcion = datos.get('descripcion')
+        exp_maestro = datos.get('exp_maestro')
+        exp_alumno = datos.get('exp_alumno')
+
+        
+        # -----------------VALIDACIONES: TODOS LOS CAMPOS LLENOS------------------------
+        # Comprobamos que ninguna variable sea None o un string vacío ('')
+        if not all([id_material, tipo_texto, cantidad, descripcion, exp_maestro, exp_alumno]):
+            return jsonify({"error": "Todos los campos son obligatorios"}), 400
+
+       
+         # -----------------VALIDACIONES: CANTIDAD MAYOR A 0 ------------------------
+       
+        try:
+            cantidad = int(cantidad)
+            if cantidad <= 0:
+                return jsonify({"error": "La cantidad debe ser un número mayor a 0"}), 400
+        except ValueError:
+            return jsonify({"error": "La cantidad enviada no es un formato numérico válido"}), 400
+
+      
+        # -----------------VALIDACIONES: EXPEDIENTES DE EXACTAMENTE 9 DÍGITOS
+        # Los convertimos a texto quitando espacios en blanco a los lados por si el usuario puso un espacio sin querer
+        exp_maestro_str = str(exp_maestro).strip()
+        exp_alumno_str = str(exp_alumno).strip()
+
+        # isdigit() asegura que sean solo números y len() cuenta que sean exactamente 9
+        if not (exp_maestro_str.isdigit() and len(exp_maestro_str) == 9):
+            return jsonify({"error": "El expediente del maestro debe tener exactamente 9 dígitos numéricos"}), 400
+            
+        if not (exp_alumno_str.isdigit() and len(exp_alumno_str) == 9):
+            return jsonify({"error": "El expediente del alumno debe tener exactamente 9 dígitos numéricos"}), 400
+
+  
+        # Transformamos el texto "Entrada" a 1 (True) y "Salida" a 0 (False) para SQL Server
+        tipo_bit = 1 if tipo_texto.lower() == 'entrada' else 0
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Usamos OUTPUT INSERTED para recuperar el ID generado automáticamente por SQL Server al insertar el nuevo registro
+        # Usamos GETDATE() de SQL Server para guardar la fecha y hora exacta del registro
+        query = """
+            SET NOCOUNT ON;
+            
+            INSERT INTO bitacora_incidencia 
+            (IdMaterial, IdLaboratorio, Tipo, Cantidad, Descripcion, Fecha, Exp_Maestro, Exp_Alumno)
+            VALUES (?, ?, ?, ?, ?, GETDATE(), ?, ?);
+            
+            SELECT SCOPE_IDENTITY();
+        """
+        
+        cursor.execute(query, (id_material, id_lab, tipo_bit, cantidad, descripcion, exp_maestro_str, exp_alumno_str))
+        
+        # Recuperamos el ID recién creado
+        nuevo_id = int(cursor.fetchone()[0])
+        
+        # Confirmamos los cambios en la BD
+        conn.commit()
+        conn.close()
+
+        # Devolvemos un 201 (Created) y el ID generado
+        return jsonify({
+            "mensaje": "Incidencia registrada con éxito", 
+            "id_bit_inc": nuevo_id
+        }), 201
+
+    except Exception as e:
+        # En caso de error de base de datos, revertimos cualquier cambio incompleto
+        if 'conn' in locals():
+            conn.rollback()
+            conn.close()
+        return jsonify({"error": str(e)}), 500
 
 #ACTUALIZAR BITACORA DE INCIDENCIA
+@app.route('/api/bitacora/incidencias/laboratorio/<int:id_lab>/<int:id_inc>', methods=['PUT'])
+def actualizar_incidencia_laboratorio(id_lab, id_inc):
+    try:
+        # Obtenemos los datos enviados desde el frontend en formato JSON
+        datos = request.json
+        
+        if not datos:
+            return jsonify({"error": "No se recibieron datos en la petición"}), 400
 
-#ELIMINAR UN REGISTRO DE LA BITACORA DE INCIDENCIA
+        # Extraemos las variables con los nuevos valores
+        id_material = datos.get('id_material')
+        tipo_texto = datos.get('tipo')
+        cantidad = datos.get('cantidad')
+        descripcion = datos.get('descripcion')
+        exp_maestro = datos.get('exp_maestro')
+        exp_alumno = datos.get('exp_alumno')
+
+         # -----------------VALIDACIONES: TODOS LOS CAMPOS LLENOS------------------------
+        # Comprobamos que ninguna variable sea None o un string vacío ('')
+        if not all([id_material, tipo_texto, cantidad, descripcion, exp_maestro, exp_alumno]):
+            return jsonify({"error": "Todos los campos son obligatorios para actualizar"}), 400
+
+         # -----------------VALIDACIONES: CANTIDAD MAYOR A 0 ------------------------
+        try:
+            cantidad = int(cantidad)
+            if cantidad <= 0:
+                return jsonify({"error": "La cantidad debe ser un número mayor a 0"}), 400
+        except ValueError:
+            return jsonify({"error": "La cantidad enviada no es un formato numérico válido"}), 400
+
+        # -----------------VALIDACIONES: EXPEDIENTES DE EXACTAMENTE 9 DÍGITOS
+        # Los convertimos a texto quitando espacios en blanco a los lados por si el usuario puso un espacio sin querer
+        exp_maestro_str = str(exp_maestro).strip()
+        exp_alumno_str = str(exp_alumno).strip()
+
+        if not (exp_maestro_str.isdigit() and len(exp_maestro_str) == 9):
+            return jsonify({"error": "El expediente del maestro debe tener exactamente 9 dígitos numéricos"}), 400
+            
+        if not (exp_alumno_str.isdigit() and len(exp_alumno_str) == 9):
+            return jsonify({"error": "El expediente del alumno debe tener exactamente 9 dígitos numéricos"}), 400
+
+    
+        tipo_bit = 1 if tipo_texto.lower() == 'entrada' else 0
+
+    
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        query = """
+            UPDATE bitacora_incidencia
+            SET IdMaterial = ?, 
+                Tipo = ?, 
+                Cantidad = ?, 
+                Descripcion = ?, 
+                Exp_Maestro = ?, 
+                Exp_Alumno = ?
+            WHERE IdLaboratorio = ? AND Id_bit_inc = ?
+        """
+        
+        cursor.execute(query, (id_material, tipo_bit, cantidad, descripcion, exp_maestro_str, exp_alumno_str, id_lab, id_inc))
+        
+        # cursor.rowcount nos dice cuántas filas se modificaron. 
+        # Si es 0, significa que esa incidencia no existe o no pertenece a ese laboratorio.
+        if cursor.rowcount == 0:
+            conn.close()
+            return jsonify({"error": "No se encontró la incidencia especificada para este laboratorio"}), 404
+
+        # Confirmamos la transacción en la BD
+        conn.commit()
+        conn.close()
+
+        return jsonify({"mensaje": "Incidencia actualizada con éxito"}), 200
+
+    except Exception as e:
+        if 'conn' in locals():
+            conn.rollback()
+            conn.close()
+        return jsonify({"error": str(e)}), 500
+    
+    
 @app.route('/api/bitacora/incidencias/<int:id>', methods=['DELETE'])
 def eliminar_incidencia(id):
+    conn = None  # 1. Inicializamos conn en None para evitar el NameError
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
         # Verificamos si la incidencia existe
-        query = "SELECT Id_bitacora FROM bitacora_incidencia WHERE Id_bitacora = ?"
+        query = "SELECT Id_bit_inc FROM bitacora_incidencia WHERE Id_bit_inc = ?"
         cursor.execute(query, (id,))
         fila = cursor.fetchone()
 
         if not fila:
+            conn.close()
             return jsonify({"mensaje": "No se encontro la incidencia"}), 404
 
-        # Eliminamos la incidencia
-        query = "DELETE FROM bitacora_incidencia WHERE Id_bitacora = ?"
+       
+        query = "DELETE FROM bitacora_incidencia WHERE Id_bit_inc = ?"
         cursor.execute(query, (id,))
         conn.commit()
 
+        cursor.close()
         conn.close()
         return jsonify({"mensaje": "Incidencia eliminada con éxito"}), 200
 
     except Exception as e:
-        conn.rollback()
-        conn.close()
+        # Imprime el error exacto en tu terminal/consola de Python para saber qué falló en SQL
+        print(f"🔴 Error interno en el servidor: {str(e)}") 
+        
+        # Solo hacemos rollback y close si la conexión se logró abrir exitosamente
+        if conn is not None:
+            try:
+                conn.rollback()
+                conn.close()
+            except Exception as db_err:
+                print(f"No se pudo cerrar la conexion: {str(db_err)}")
+                
         return jsonify({"error": str(e)}), 500
     
 #usuario

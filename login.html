@@ -1,21 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!--Libreria para las alertas-->
     <title>Document</title>
 </head>
+<body class="login-body">
 
-<body>
-    <h1>Inicio de sesion</h1>
-    <input type="text" id="usuario">
-    <input type="password" id="contraseña">
-    <input type="submit" name="Enviar datos" id="enviar-datos">
+    <div class="login-container animate-pop">
+        <!-- Sección Izquierda: Logo Grande -->
+        <div class="login-brand">
+            <h1>StockerLab</h1>
+        </div>
 
+        <!-- Sección Derecha: Tarjeta de Login -->
+        <div class="login-card-wrapper">
+            <div class="login-card">
+                <!-- Icono superior de usuario -->
+                <div class="avatar-container">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                
+                <h2>Inicio de Sesión</h2>
+                
+                <form onsubmit="return false;">
+                    <div class="input-group">
+                        <input type="text" id="usuario" placeholder="Usuario" required autocomplete="username">
+                    </div>
+                    
+                    <div class="input-group">
+                        <input type="password" id="contraseña" placeholder="Contraseña" required autocomplete="current-password">
+                    </div>
+                    
+                    <!-- Mantenemos el input submit con su id exacto para tu JS -->
+                    <input type="submit" value="Enviar" id="enviar-datos">
+                </form>
 
+                <!-- Enlaces de soporte abajo -->
+                <div class="login-footer-links">
+                    <a href="#" class="link-register">Registrarse</a>
+                    <a href="#" class="link-forgot">¿No recuerdas tu contraseña?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tu script JS -->
     <script src="script (1).js"></script>
 </body>
-
 </html>
