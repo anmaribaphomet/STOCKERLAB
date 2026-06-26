@@ -43,7 +43,7 @@ btnEnviar.addEventListener('click', async (e) => {//cuando hagas click
             sessionStorage.setItem('nombreUsuario', usuarioRecibido.Usuario); // Opcional, por si quieres mostrar su nombre
 
             // Redirigimos a la ventana principal o panel de control
-            window.location.href = 'catalogomateriales/materiales.html';
+            window.location.href = 'bit_materiales/bitacora.html';
         } else {
             alert("La contraseña introducida es incorrecta.");
         }

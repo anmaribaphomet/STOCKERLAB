@@ -36,6 +36,27 @@ btnbit_materiales.addEventListener('click', () => {
     window.location.href = '../bit_materiales/bitacora.html';
 });
 
+//---------------------------OBTRENER EL ID DEL LABORATORIO DESDE EL LOCAL STORAGE PARA USARLO EN LAS SOLICITUDES AL SERVIDOR-------------------------------
+const ID_LAB_ACTUAL = 1;
+
+async function cargarNombreLaboratorio() {
+    try {
+        // Hacemos una petición a tu API de Flask para traer los datos del lab actual
+        const respuesta = await fetch(`http://localhost:5000/api/laboratorios/${ID_LAB_ACTUAL}`);
+        const datosLab = await respuesta.json();
+
+        console.log("Datos del laboratorio obtenido:", datosLab.categoria); // Verifica que estás recibiendo el nombre correctamente
+        if (respuesta.ok) {
+            // Asumiendo que Flask devuelve algo como { "nombre": "Química" }
+            document.getElementById('nombre-lab-dinamico').textContent = datosLab.categoria;
+        }
+    } catch (error) {
+        console.error("Error al obtener el nombre del laboratorio:", error);
+    }
+}
+
+// Ejecutamos la función apenas cargue la pantalla
+cargarNombreLaboratorio();
 
 //-------------------------SECCION DESTINADA A OBTENER LAS INCIDENCIAS-----------------------------------------------------------------------------------
 
@@ -59,16 +80,16 @@ function mapearIncidencias(incidencias) {
         const card = document.createElement('div');
         card.className = 'incidencia-card';
 
-
+       const fechaLimpia = incidencia.fecha.split('T')[0];
         //Card
         card.innerHTML = `
 
             <!-- BOTÓN ACTUALIZAR -->
-            <button 
-                class="btn-actualizar"
-                title="Actualizar Incidencia">
-                <i data-lucide="pencil"></i>
-            </button>
+           <button 
+           class="btn-actualizar" 
+           title="Actualizar Incidencia">
+          <i data-lucide="pencil"></i>
+          </button>
              <!-- BOTÓN ELIMINAR -->
             <button 
                 class="btn-eliminar"
@@ -78,7 +99,7 @@ function mapearIncidencias(incidencias) {
             <div class="incidencia-header">
                 <div>
                     <h3>Registro #${incidencia.id_bitacora}</h3>
-                    <p>${incidencia.fecha}</p>
+                    <p>${fechaLimpia}</p>
                 </div>
                 <div class="incidencia-descripcion">
                     ${incidencia.tipo}
@@ -123,14 +144,14 @@ function mapearIncidencias(incidencias) {
 
         // BOTÓN ELIMINAR
         const btnEliminar = card.querySelector('.btn-eliminar');
-        btnEliminar.addEventListener('click', () => {
-            eliminarIncidencia(incidencia.Id_bitacora);//Al dar click en el boton eliminar se ejecuta la funcion eliminarIncidencia que se encuentra mas abajo y se le pasa el id de la incidencia para eliminarla
-        });
+       btnEliminar.addEventListener('click', () => {
+       eliminarIncidencia(incidencia.id_bitacora); // 👈 ¡Todo en minúsculas!
+});
 
-        // BOTÓN ACTUALIZAR
+       // BOTÓN ACTUALIZAR
         const btnActualizar = card.querySelector('.btn-actualizar');
         btnActualizar.addEventListener('click', () => {
-            actualizarIncidencia(incidencia);//Al dar click en el boton actualizar se ejecuta la funcion actualizarIncidencia que se encuentra mas abajo y se le pasa toda la informacion de la incidencia para actualizarla
+            mapForm('actualizar', incidencia); 
         });
         contenedor.appendChild(card);
     });
@@ -209,114 +230,320 @@ const search = document.getElementById('btn-buscar-filtro');
 search.addEventListener('click', () => {//Boton que al clickear ejecuta el evento para que se busque la venta
     buscarIncidencias();
 });
-//-------------------------SECCION DESTINADA A LA CREACION DE LAS INCIDENCIAS-----------------------------------------------------------------------------------
-//Metodo para crear una nueva incidencia, al dar click en el boton de crear incidencia se muestra un formulario para ingresar los datos de la nueva incidencia y luego se envia al servidor para que se guarde en la base de datos
-const btnCrear = document.getElementById('btnagregar');
-function mapForm(tipo) {
-    const contenedor = document.getElementById('Form-incidencias');
 
-    //  Modificamos los botones para que usen onclick="cambiarCantidad(...)"
+
+//-------------------------SECCION DESTINADA A LA CREACION DE LAS INCIDENCIAS-----------------------------------------------------------------------------------
+//METODO PARA MAPEAR LOS FORMULARIOS DE ACTUALIZAR Y CREAR
+function mapForm(tipo, datos = null) {
+    const contenedor = document.getElementById('Form-incidencias');
+    
+    // Bloque HTML para el paso de cantidades, reutilizado tanto en "Agregar" como en "Actualizar" 
     const bloqueCantidad = `
         <div class="field">
             <label>Cantidad:</label>
             <div class="stepper-container">
                 <button type="button" class="btn-step" onclick="cambiarCantidad('restar')" style="width: 30px; cursor: pointer;">-</button>
-                <input type="number" id="display-cantidad" name="cantidad" value="1" min="1" readonly>
+                <input type="number" id="display-cantidad" name="cantidad" value="${datos ? datos.cantidad : 1}" min="1" readonly>
                 <button type="button" class="btn-step" onclick="cambiarCantidad('sumar')" style="width: 30px; cursor: pointer;">+</button>
             </div>
         </div>
     `;
-
+    // Dependiendo del tipo de formulario que se quiera mostrar, se renderiza el HTML correspondiente
     if (tipo === 'agregar') {
         contenedor.style.display = 'flex';
         contenedor.innerHTML = `
-            <form id="form-agregar" class="forms">
-                <button type="button" class="btn-cerrar-dinamico" id ="cerrar-form-agregar">
+            <form id="form-agregar" class="forms" onsubmit="event.preventDefault(); guardarIncidencia();">
+                <button type="button" class="btn-cerrar-dinamico" onclick="cerrarFormulario()">
                     &times;
                 </button>
                 <h3>Registro de Incidencia</h3>
                 
                 <label>Selecciona el material:</label>
-                <select name="Material" id="select-ids" class="select-int">
+                <select name="Material" id="select-ids" class="select-int" required onchange="console.log('Valor seleccionado:', this.value)">
                     <option value="">Cargando...</option>
                 </select>
 
                 ${bloqueCantidad}
 
-                <input type="text" name="descripcion" placeholder="Descripción" required autofocus style="font-size: 16px;">
-                <input type="text" name="maestro" placeholder="Expediente del Maestro" required autofocus style="font-size: 16px;">
-                <input type="text" name="alumno" placeholder="Expediente del Alumno" required autofocus style="font-size: 16px;">
+                <input type="text" id="ins-descripcion" name="descripcion" placeholder="Descripción" required autofocus style="font-size: 16px;">
+                <input type="text" id="ins-maestro" name="maestro" placeholder="Expediente del Maestro" required autofocus style="font-size: 16px;">
+                <input type="text" id="ins-alumno" name="alumno" placeholder="Expediente del Alumno" required autofocus style="font-size: 16px;">
 
                 <select name="Tipo" id="select-tipo" class="select-int">
-                    <option value="Salida">Salida</option>
-                    <option value="Entrada">Entrada</option>
+                    <option value="0">Salida</option>
+                    <option value="1">Entrada</option>
                 </select>
                 
                 <button type="submit">Guardar Incidencia</button>
             </form>
         `;
 
-        cargarIdCombo();
-        const btnCerrarPost = document.getElementById('cerrar-form-agregar');
-        btnCerrarPost.addEventListener('click', () => {
-            contenedor.style.display = 'none';
-        });
-
+        cargarCombo();// Carga el combo de materiales para el formulario de agregar
+      
+     //Mapeo para el form de actualizar, se le pasan los datos de la incidencia seleccionada para que se muestren en el formulario y se puedan modificar
     } else if (tipo === 'actualizar') {
+          const fechaLimpia = datos.fecha.split('T')[0];
+        // Escudo protector: Si 'datos' viene vacío, cancelamos antes de que explote
+        if (!datos) {
+            console.error("Error: No se enviaron los datos al formulario de actualización");
+            alert("No se pudo cargar la información de esta incidencia.");
+            return; 
+        }
+
         contenedor.style.display = 'flex';
         contenedor.innerHTML = `
-            <form id="form-actualizar" class="forms">
-                <button type="button" class="btn-cerrar-dinamico" id ="cerrar-form-actualizar">
+            <form id="form-actualizar" class="forms" onsubmit="event.preventDefault(); modificarIncidencia(${datos.id_bitacora});">
+                <button type="button" class="btn-cerrar-dinamico" onclick="cerrarFormulario()">
                     &times;
                 </button>
-                <h3>Actualizar Incidencia</h3>
+                <p style="margin-top: 0px;">${fechaLimpia}</p>
+                <h3>Actualizar Incidencia (${datos.id_bitacora})</h3>
                 
+
                 <label>Selecciona el material:</label>
-                <select name="Material" id="select-ids" class="select-int">
+                <select name="Material" id="select-ids" class="select-int" required onchange="console.log('Valor seleccionado:', this.value)">
                     <option value="">Cargando...</option>
                 </select>
 
                 ${bloqueCantidad}
 
-                <input type="text" name="descripcion" placeholder="Descripción" required autofocus>
-                <input type="text" name="maestro" placeholder="Expediente del Maestro" required autofocus>
-                <input type="text" name="alumno" placeholder="Expediente del Alumno" required autofocus>
+                <input type="text" id="ins-descripcion" value="${datos.descripcion}" placeholder="Descripción" required>
+                <input type="text" id="ins-maestro" value="${datos.exp_maestro}" placeholder="Expediente del Maestro" required>
+                <input type="text" id="ins-alumno" value="${datos.exp_alumno}" placeholder="Expediente del Alumno" required>
                 
-                <select name="Tipo" id="select-tipo" class="select-tipo">
-                    <option value="Salida">Salida</option>
-                    <option value="Entrada">Entrada</option>
+                <select name="Tipo" id="select-tipo" class="select-int">
+                    <option value="0" ${datos.tipo === 'Salida' ? 'selected' : ''}>Salida</option>
+                    <option value="1" ${datos.tipo === 'Entrada' ? 'selected' : ''}>Entrada</option>
                 </select>
                 
                 <button type="submit">Guardar Cambios</button>
             </form>
         `;
-
-        cargarIdCombo();
-        const btnCerrarUpdate = document.getElementById('cerrar-form-actualizar');
-        btnCerrarUpdate.addEventListener('click', () => {
-            contenedor.style.display = 'none';
-        });
+        cargarCombo(datos.id_material);
+       
     }
     
-    // ¡Nota que toda la lógica de "btnPlus.addEventListener..." que estaba aquí fue eliminada!
 }
+//FUNCION PARA GUARDAR EL FORMULARIO DE AGREGAR(POST)
+async function guardarIncidencia() {
+    const payload = recolectarDatosFormulario();
+    console.log("Payload a enviar:", payload);
+    if (!payload) return; // Si no pasa las validaciones de JS, detiene la ejecución
 
+    try {
+        const respuesta = await fetch(`http://localhost:5000/api/bitacora/incidencias/laboratorio/${ID_LAB_ACTUAL}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const resultado = await respuesta.json();
+if (respuesta.ok) {
+            // Alerta de éxito con estilo oscuro y botón índigo
+            Swal.fire({
+                title: '¡Guardado!',
+                text: resultado.mensaje,
+                icon: 'success',
+                background: '#1c2242',       // Tu color --bg-muted2
+                color: '#f8fafc',            // Tu color --text-main
+                confirmButtonColor: '#4a28ff', // Tu color --accent-main
+                iconColor: '#00e6a8',        // Tu color --success
+                width: '320px'
+            }).then(() => {
+                // Poner esto dentro del .then() hace que el formulario se cierre 
+                // y la tabla se recargue JUSTO DESPUÉS de que el usuario le da "OK" a la alerta
+                document.getElementById('Form-incidencias').style.display = 'none';
+                cargarIncidencias(); 
+            });
+        } else {
+            // Alerta de error (rechazo del servidor) con botón magenta
+            Swal.fire({
+                title: 'Error',
+                text: resultado.error,
+                icon: 'error',
+                background: '#1c2242',
+                color: '#f8fafc',
+                confirmButtonColor: '#ff2a5f', // Tu color --danger
+                width: '320px'
+            });
+        }
+    } catch (error) {
+        console.error("Error al guardar:", error);
+        // Alerta de error crítico (no hay conexión)
+        Swal.fire({
+            title: 'Sin conexión',
+            text: 'No se pudo conectar con el servidor.',
+            icon: 'error',
+            background: '#1c2242',
+            color: '#f8fafc',
+            confirmButtonColor: '#ff2a5f',
+            width: '320px'
+        });
+    }
+}
+//FUNCION PARA GUARDAR EL FORMULARIO DE ACTUALIZAR (PUT)
+async function modificarIncidencia(id_inc) {
+    const payload = recolectarDatosFormulario();
+    if (!payload) return;
+
+    try {
+        const respuesta = await fetch(`http://localhost:5000/api/bitacora/incidencias/laboratorio/${ID_LAB_ACTUAL}/${id_inc}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const resultado = await respuesta.json();
+
+        if (respuesta.ok) {
+            // Alerta de éxito con estilo oscuro y botón índigo
+            Swal.fire({
+                title: '¡Actualizado!',
+                text: resultado.mensaje,
+                icon: 'success',
+                background: '#1c2242',
+                color: '#f8fafc',
+                confirmButtonColor: '#4a28ff',
+                iconColor: '#00e6a8',
+                width: '320px'
+            }).then(() => {
+                document.getElementById('Form-incidencias').style.display = 'none';
+                cargarIncidencias();
+            });
+        } else {
+            // Alerta de error (rechazo del servidor) con botón magenta
+            Swal.fire({
+                title: 'Error',
+                text: resultado.error,
+                icon: 'error',
+                background: '#1c2242',
+                color: '#f8fafc',
+                confirmButtonColor: '#ff2a5f',
+                width: '320px'
+            });
+        }
+    } catch (error) {
+        console.error("Error al actualizar:", error);
+        // Alerta de error crítico (no hay conexión)
+        Swal.fire({
+            title: 'Sin conexión',
+            text: 'No se pudo conectar con el servidor.',
+            icon: 'error',
+            background: '#1c2242',
+            color: '#f8fafc',
+            confirmButtonColor: '#ff2a5f',
+            width: '320px'
+        });
+    }
+}
+//FUNCION DE CERRAR LOS FORMULARIOS
+function cerrarFormulario() {
+    const contenedor = document.getElementById('Form-incidencias');
+    if (contenedor) {
+        contenedor.style.display = 'none';
+    }
+}
+//FUNCION PARA EL PASO DE CANTIDADES (MANTENIDA GLOBAL PARA SER USADA EN AMBOS FORMULARIOS)
 function cambiarCantidad(operacion) {
     const inputCantidad = document.getElementById('display-cantidad');
     if (!inputCantidad) return; // Si el input no existe, no hace nada
 
     let valorActual = parseInt(inputCantidad.value);
     
-    if (operacion === 'sumar') {
+    if (operacion === 'sumar') { // Si la operación es sumar, incrementa el valor actual en 1
         inputCantidad.value = valorActual + 1;
-    } else if (operacion === 'restar' && valorActual > 1) {
+    } else if (operacion === 'restar' && valorActual > 1) { // Si la operación es restar y el valor actual es mayor a 1, decrementa el valor actual en 1
         inputCantidad.value = valorActual - 1;
     }
 }
 
+//--------------------LLENAR COMBOBOX DE LOS MATERIALES--------------------------------------------------------------------------------------
+async function cargarCombo(id_material_seleccionado = null) {
+    const selectMaterial = document.getElementById('select-ids');
+    if (!selectMaterial) return;
 
+    try {
+        // Hacemos la petición a la API para obtener los materiales del laboratorio actual
+        const respuesta = await fetch(`http://localhost:5000/api/materiales/laboratorio/${ID_LAB_ACTUAL}`);
+        
+        if (!respuesta.ok) {
+            throw new Error("Error en la respuesta del servidor");
+        }
 
+        const materiales = await respuesta.json();// Obtenemos el array de materiales desde la respuesta JSON
 
+        // Limpiamos el combo y colocamos la opción por defecto inicial
+        selectMaterial.innerHTML = '<option value="">-- Seleccione un Material --</option>';
+
+      // Recorremos la lista de materiales que nos devolvió Flask
+        materiales.forEach(material => {
+            const opcion = document.createElement('option');
+            
+            
+            opcion.value = material.IdMaterial;// El valor de la opción es el ID del material          
+            opcion.textContent = material.Nombre_Material; // El texto que se muestra en el combo es el nombre del material
+
+            // Si se pasó un ID de material seleccionado (en el caso de actualizar) y coincide con el material actual del loop, marcamos esa opción como seleccionada
+            if (id_material_seleccionado && material.IdMaterial === parseInt(id_material_seleccionado)) {
+                opcion.selected = true;
+            }
+            // Agregamos la opción al elemento select
+            selectMaterial.appendChild(opcion);
+        });
+
+    } catch (error) {
+        console.error("Error al poblar el combo de materiales:", error);
+        selectMaterial.innerHTML = '<option value="">Error al cargar materiales</option>';
+    }
+}
+
+//  RECOLECTAR Y VALIDAR DATO DE LOS VALORES INGRESADOS EN LOS FORMULARIOS DE AGREGAR Y ACTUALIZAR, PARA LUEGO ENVIARLOS EN EL BODY DE LAS SOLICITUDES POST Y PUT
+function recolectarDatosFormulario() {
+    const id_material = document.getElementById('select-ids').value;
+    const cantidad = parseInt(document.getElementById('display-cantidad').value);
+    const descripcion = document.getElementById('ins-descripcion').value.trim();
+    const exp_maestro = document.getElementById('ins-maestro').value.trim();
+    const exp_alumno = document.getElementById('ins-alumno').value.trim();
+    const tipoVal = document.getElementById('select-tipo').value;
+
+    const tipo = tipoVal === "1" ? "Entrada" : "Salida";
+
+    // 1. Creamos una configuración base para las alertas de error
+    const alertaError = {
+        icon: 'error',
+        width: '280px',
+        confirmButtonColor: '#855597', // Tu color morado
+        confirmButtonText: 'Entendido'
+    };
+
+    // 2. Reemplazamos los alert() usando Swal.fire y el operador spread (...) 
+    // para combinar la configuración base con el título y texto específico.
+    if (!id_material) {
+        Swal.fire({ ...alertaError, title: 'Falta Material', text: 'Por favor, selecciona un material válido.' });
+        return null;
+    }
+    if (cantidad <= 0) {
+        Swal.fire({ ...alertaError, title: 'Cantidad Inválida', text: 'La cantidad debe ser un número positivo mayor a cero.' });
+        return null;
+    }
+    if (exp_maestro.length !== 9 || isNaN(exp_maestro)) {
+        Swal.fire({ ...alertaError, title: 'Expediente Inválido', text: 'El expediente del maestro debe contener exactamente 9 dígitos numéricos.' });
+        return null;
+    }
+    if (exp_alumno.length !== 9 || isNaN(exp_alumno)) {
+        Swal.fire({ ...alertaError, title: 'Expediente Inválido', text: 'El expediente del alumno debe contener exactamente 9 dígitos numéricos.' });
+        return null;
+    }
+
+    return {
+        id_material: parseInt(id_material),
+        tipo: tipo,
+        cantidad: cantidad,
+        descripcion: descripcion,
+        exp_maestro: exp_maestro,
+        exp_alumno: exp_alumno
+    };
+}
 
 
 //-------------------------SECCION DESTINADA A LA ELIMINACION DE LAS INCIDENCIAS-----------------------------------------------------------------------------------
