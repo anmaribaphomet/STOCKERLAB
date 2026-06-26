@@ -10,24 +10,23 @@ app = Flask(__name__)
 CORS(app)
 # Función central para conectar a la base de datos
 def get_db_connection():
+    #conexion = pyodbc.connect(
+        #'DRIVER={ODBC Driver 17 for SQL Server};'
+        #'SERVER=192.168.100.78;'  # Tu dominio DNS configurado
+        #'DATABASE=stockerlab;'         # El nombre de la base de datos que creaste
+        #'UID=Super_Stocker;'      # El usuario que debes crear en SQL Server (PROHIBIDO usar 'sa')
+        #'PWD=Windows2016'      # La contraseña de ese usuario
+    #)
+   #conexion maria
     conexion = pyodbc.connect(
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=192.168.100.78;'  # Tu dominio DNS configurado
-        'DATABASE=stockerlab;'         # El nombre de la base de datos que creaste
-        'UID=Super_Stocker;'      # El usuario que debes crear en SQL Server (PROHIBIDO usar 'sa')
-        'PWD=Windows2016'      # La contraseña de ese usuario
-    )
-   #conexion maria
-     #conexion = pyodbc.connect(
-        #'DRIVER={ODBC Driver 17 for SQL Server};'
-        #'SERVER=DESKTOP-RO62CP8\\MARILUBERSK;'
+        'SERVER=DESKTOP-RO62CP8\\MARILUBERSK;'
         #'SERVER=localhost\\SQLEXPRESS;'
         #'SERVER=db.stockerlab.local;'
-        #'DATABASE=stockerlab;'
-        #'UID=Super_Stocker;'
-        #'PWD=Windows2016;'  
-        #'TrustServerCertificate=yes;'
-            #)
+        'DATABASE=stockerlab;'
+        'UID=Super_Stocker;'
+        'PWD=Windows2016;'  
+        'TrustServerCertificate=yes;' )
     #conexion melissa
     
     return conexion
@@ -1297,7 +1296,8 @@ def obtener_laboratorio_por_idUsuario(nombre):
         conn.rollback()
         conn.close()
         return jsonify({"error": str(e)}), 500
-
+    
+    
 if __name__ == '__main__':
     # Esto levanta el servidor en el puerto 5000
     app.run(debug=True, port=5000)

@@ -16,12 +16,7 @@ tabs.forEach(tab => {
     });
 });
 //----- Funcionalidad de navegación
-//a inicio
-const btnInicio = document.getElementById('pp-nav');
-btnInicio.addEventListener('click', () => {
-    // Salimos de /bitincidencias/ y entramos a /pp/
-    window.location.href = '../pp/pp.html';
-});
+
 //a materiales
 const btnMateriales = document.getElementById('btn-nav-materiales');
 btnMateriales.addEventListener('click', () => {
