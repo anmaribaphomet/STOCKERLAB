@@ -14,14 +14,18 @@
     <!--SECCION DE MENU-->
     <header class="navbar">
         <h1 class="logo">STOCKERLAB</h1>
-        <button class="btn-caja"><i data-lucide="user"></i> Usuario</button>
+        <div id="status-server" class="server-status-box">
+            <span class="status-dot"></span>
+            <span id="status-text" class="status-text">Conectando...</span>
+        </div>
+        <button class="btn-caja"><i data-lucide="user"></i> <span id="txt-usuario-header">Usuario</span></button>
     </header>
 
     <nav class="tabs">
         <button class="tab" id="pp-nav"><i data-lucide="star"></i> Inicio</button>
         <button class="tab" id="btn-nav-materiales"><i data-lucide="book-open"></i> Materiales</button>
-        <button class="tab" id="btn-nav-bitacora"><i data-lucide="folder"></i> Bitácora de Materiales</button>
-        <button class="tab active"><i data-lucide="bookmark"></i> Incidencias</button>
+        <button class="tab active" id="btn-nav-bitacora"><i data-lucide="folder"></i> Bitácora de Materiales</button>
+        <button class="tab"><i data-lucide="bookmark"></i> Incidencias</button>
     </nav>
 
     <!--SECCION PARA INCIDENCIAS-->
@@ -35,12 +39,11 @@
 
             </div>
 
-            <div class="buscador-incidencias">
+            <div class="buscador-bitacoras">
 
                 <select id="tipo-filtro">
                     <option value="id">ID</option>
                     <option value="Profesor">Profesor</option>
-                    <option value="Alumno"> Alumno</option>
 
                 </select>
 
@@ -50,25 +53,27 @@
                     <i data-lucide="search"></i>
                 </button>
             </div>
-            <div class="content-incidencias-p">
+            <div class="content-bitacoras-p">
                 <input type="button" id="btnagregar" class="btns" data-lucide="plus" onclick="mapForm('agregar')">
 
-                <div id="contenedor-incidencias">
+                <div id="contenedor-bitacoras">
 
 
-                    <!--INSERTAR LAS CARDS DE INCIDENCIAS-->
+                    <!--INSERTAR LAS CARDS DE BITACORAS-->
 
                 </div>
             </div>
 
-            <div id="Form-incidencias" class="form-overlay">
+            <div id="Form-bitacoras" class="form-overlay">
 
             </div>
         </main>
 
     </div>
     <footer class="bottom-bar">
-        <i data-lucide="log-out" class="exit-icon"></i>
+        <button id="btn-cerrar-sesion" class="btn-exit" title="Cerrar Sesión">
+            <i data-lucide="log-out" class="exit-icon"></i>
+        </button>
     </footer>
     <script src="bitacora.js"></script>
 

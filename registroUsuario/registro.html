@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="registro.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!--Libreria para las alertas-->
+    <title>Registro de Usuario</title>
+</head>
+
+<body>
+    <div class="form-container">
+        <form id="form-usuario">
+            <h2>Registro de Usuario</h2>
+
+            <div class="campo">
+                <label for="usuario">Usuario</label>
+                <input type="text" id="usuario" placeholder="Ingrese usuario" required>
+            </div>
+
+            <div class="campo">
+                <label for="rol">Rol</label>
+                <select id="rol" required>
+                    <option value="">Seleccione un rol</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Encargado">Encargado</option>
+                    <option value="Maestro">Maestro</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label for="contrasenia">Contraseña</label>
+                <input type="password" id="contrasenia" placeholder="Ingrese contraseña" required>
+            </div>
+
+            <div class="campo">
+                <label for="laboratorio-select">Laboratorio</label>
+                <select id="laboratorio-select" required>
+                    <option value="">Cargando laboratorios...</option>
+                </select>
+            </div>
+
+            <button type="submit">Registrar Usuario</button>
+
+            <!-- Enlace para redirigir al inicio de sesión -->
+            <p class="login-redirect">
+                ¿Ya tienes cuenta? <a href="../login.html">Inicia sesión aquí</a>
+            </p>
+        </form>
+    </div>
+    <script src="registro.js"></script>
+</body>
+
+</html>

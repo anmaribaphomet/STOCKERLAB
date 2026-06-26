@@ -14,15 +14,19 @@
 <body>
     <header class="navbar">
         <h1 class="logo">STOCKERLAB</h1>
-        <button class="btn-caja"><i data-lucide="user"></i> Caja</button>
+        <div id="status-server" class="server-status-box">
+            <span class="status-dot"></span>
+            <span id="status-text" class="status-text">Conectando...</span>
+        </div>
+        <button class="btn-caja"><i data-lucide="user"></i> <span id="txt-usuario-header">Usuario</span></button>
     </header>
 
     <main class="container">
         <nav class="tabs">
             <button class="tab" id="pp-nav"><i data-lucide="star"></i> Inicio</button>
-            <button class="tab" id="btn-nav-ventas"><i data-lucide="bookmark"></i> Venta</button>
-            <button class="tab active"><i data-lucide="book-open"></i> Materiales</button>
-            <button class="tab" id="btn-nav-editorial"><i data-lucide="folder"></i> Editoriales</button>
+            <button class="tab active" id="btn-nav-materiales"><i data-lucide="book-open"></i> Materiales</button>
+            <button class="tab" id="btn-nav-bitacora"><i data-lucide="folder"></i> Bitácora de Materiales</button>
+            <button class="tab"><i data-lucide="bookmark"></i> Incidencias</button>
         </nav>
 
         <div class="contenedor-principal">
@@ -30,8 +34,9 @@
                 <h2 class="section-title">Materiales</h2>
                 <div class="search-bar">
                     <select id="tipo-filtro">
-                        <option value="id">ID</option>
-                        <option value="nombre">Nombre</option>
+                        <option value="id" class="opciones-header">ID</option>
+                        <option value="nombre" class="opciones-header">Nombre</option>
+                        <option value="cantidad" class="opciones-header">Cantidad</option>
                     </select>
                     <input type="text" id="input-busqueda" placeholder="Busqueda">
                     <button class="btn-search" id="btn-search-material"><i data-lucide="search"></i></button>
@@ -42,7 +47,7 @@
             <div class="material-grid" id="material-container">
                 <!-- La primera tarjeta siempre es la de "Agregar" -->
                 <div class="card-add" id="btn-abrir-modal-add">
-                    <div class="inner-add">
+                    <div class=" inner-add">
                         <i data-lucide="book-plus"></i>
                     </div>
                     <span style="margin-top: 20px; font-weight: bold;">Agregar</span>
@@ -50,110 +55,17 @@
                 <!-- material4es cargados de la API -->
             </div>
         </div>
+
+        <div id="Form-materiales" class="form-overlay">
+
+            <!--Formulario para crear materiales o editar materiales-->
+
+        </div>
     </main>
-
-    <!-- MODAL PARA CREAR MATERIAL -->
-    <div id="modal-crear-material" class="modal-overlay">
-        <div class="modal-content-crear animate-pop">
-            <div class="modal-header-crear">
-                <h2>Agregar Material Final</h2>
-                <span class="close-modal-crear">&times;</span>
-            </div>
-
-            <div class="modal-body-crear">
-                <div class="datosgenerales">
-                    <h3 style="margin-top: 3px;">Datos</h3>
-                    <div class="row">
-                        <div class="field">
-                            <label>Nombre *</label>
-                            <input type="text" id="nombreCrear">
-                        </div>
-                        <div class="field">
-                            <label>Cantidad</label>
-                            <input type="number" id="cantidad-material" value="1">
-                        </div>
-                    </div>
-                    <div class="modal-footer-crear">
-                        <button class="btn-cancelar" id="btn-cancelar-crear">Cancelar</button>
-                        <button class="btn-guardar" id="btn-confirmar-guardar">Guardar</button>
-                    </div>
-                </div>
-
-                <div class="imagen-Id">
-                    <div class="preview-box" id="editar-material-preview"
-                        style="cursor: pointer; background-size: cover; background-position: center; position: relative;">
-                        <span id="display-edit-id">id: Pendiente</span><!--Id del material-->
-                        <div id="preview-placeholder" style="text-align: center;">
-                            <i data-lucide="image" style="height: 50px; width: 50px; position: relative; top: 0x;"></i>
-                        </div>
-                    </div>
-
-                    <input type="file" id="file-uploader-editar" accept="image/*" style="display: none;">
-
-                    <div class="field">
-                        <label>Imagen</label>
-                        <div class="input-with-button">
-                            <input type="text" id="editar-url-img" placeholder="img/ejemplo.jpg">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL PARA EDITAR MATERIAL -->
-    <div id="modal-editar-material" class="modal-overlay">
-        <input type="hidden" id="edit-material-id">
-        <div class="modal-content-crear animate-pop">
-            <div class="modal-header-crear">
-                <h2>Editar Producto Final</h2>
-                <span class="close-modal-editar">&times;</span>
-            </div>
-
-            <div class="modal-body-crear">
-                <div class="datosgenerales">
-                    <h3 style="margin-top: 3px;">Datos</h3>
-                    <div class="row">`
-                        <div class="field">
-                            <label>Nombre *</label>
-                            <input type="text" id="nombreEditar">
-                        </div>
-                        <div class="field">
-                            <label>Cantidad</label>
-                            <input type="number" id="editar-cantidad" value="1">
-                        </div>
-                    </div>
-
-                    <div class="modal-footer-crear">
-                        <button class="btn-guardar" id="btn-confirmar-editar">Guardar</button>
-                    </div>
-                </div>
-                <div class="imagen-Id">
-                    <div class="preview-box" id="editar-material-preview"
-                        style="cursor: pointer; background-size: cover; background-position: center; position: relative;">
-                        <span id="display-edit-id">id: Pendiente</span><!--Id del material-->
-                        <div id="preview2-placeholder"
-                            style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 200px; width: 100%;">
-                            <i data-lucide="image" style="height: 50px; width: 50px;"></i>
-                        </div>
-                    </div>
-
-                    <input type="file" id="file-uploader-editar" accept="image/*"
-                        style="display: none;"><!--Mappear la imagen-->
-
-                    <div class="field">
-                        <label>Imagen</label>
-                        <div class="input-with-button">
-                            <input type="text" id="editarif-url-img" placeholder="img/ejemplo.jpg">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <footer class="bottom-bar">
-        <i data-lucide="log-out" class="exit-icon"></i>
+        <button id="btn-cerrar-sesion" class="btn-exit" title="Cerrar Sesión">
+            <i data-lucide="log-out" class="exit-icon"></i>
+        </button>
     </footer>
 
     <script src="materiales.js"></script>

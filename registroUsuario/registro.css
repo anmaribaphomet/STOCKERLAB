@@ -1,0 +1,122 @@
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4eef7;
+    background-image:
+        radial-gradient(at 0% 0%, rgba(225, 200, 240, 0.4) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(180, 140, 210, 0.25) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(245, 230, 255, 0.5) 0px, transparent 40%);
+    background-attachment: fixed;
+}
+
+#form-usuario {
+    width: 440px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(125, 76, 146, 0.12);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+#form-usuario h2 {
+    text-align: center;
+    color: #7d4c92;
+    font-size: 26px;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.campo label {
+    font-size: 14px;
+    color: #6a5377;
+    font-weight: 500;
+    text-align: left;
+}
+
+#form-usuario input,
+#form-usuario select {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 1px solid #e1d4e8;
+    background-color: #ffffff;
+    font-size: 15px;
+    color: #4a4a4a;
+    box-sizing: border-box;
+    transition: all 0.25s ease;
+}
+
+#form-usuario input:focus,
+#form-usuario select:focus {
+    outline: none;
+    border-color: #9b59b6;
+    box-shadow: 0 0 0 4px rgba(151, 80, 180, 0.12);
+}
+
+#form-usuario input::placeholder {
+    color: #bbb0c4;
+}
+
+#form-usuario button {
+    margin-top: 15px;
+    padding: 14px 40px;
+    border: none;
+    border-radius: 50px;
+    background: #875498;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: center;
+    transition: all 0.2s ease;
+}
+
+
+#form-usuario button:hover {
+    background: #744484;
+    transform: translateY(-1px);
+}
+
+#form-usuario button:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 8px rgba(116, 68, 132, 0.25);
+}
+
+
+.login-redirect {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #6a5377;
+}
+
+.login-redirect a {
+    color: #875498;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.login-redirect a:hover {
+    color: #744484;
+    text-decoration: underline;
+}
