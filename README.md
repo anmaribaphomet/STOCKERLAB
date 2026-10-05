@@ -1,7 +1,8 @@
 # Stocker_Lab
 
 Sistema de manejo y control de inventarios , con una bitácora de entrada y salida , así como también
-una de incidencias para la gestión de perdidas o daños.Propuesta para centralizar la gestion de multiples laboratorios
+una de incidencias para la gestión de perdidas o daños.Propuesta para centralizar la gestion de multiples laboratorios.Proyecto perteneciente
+a la materia de Servidores II
 
 ## Interfaz Grafica
 
