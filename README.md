@@ -1,7 +1,7 @@
 # Stocker_Lab
 ## Creadores
 @anmaribaphomet
-@MushCay
+@MushCay 
 
 ## Descripción
 Sistema de manejo y control de inventarios , con una bitácora de entrada y salida , así como también
