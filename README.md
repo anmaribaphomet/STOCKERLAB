@@ -1,6 +1,6 @@
 # Stocker_Lab
 ## Creadores
-@anmaribaphomet
+@anmaribaphomet <br>
 @MushCay 
 
 ## Descripción
