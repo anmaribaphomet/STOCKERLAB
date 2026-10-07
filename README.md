@@ -1,7 +1,8 @@
 # Stocker_Lab
 ## Creadores
-@anmaribaphomet <br>
-@MushCay 
+
+<a href="https://github.com/anmaribaphomet"> @anmaribaphomet</a><br>
+<a href="https://github.com/MushCay"> @MushCay</a>
 
 ## Descripción
 Sistema de manejo y control de inventarios , con una bitácora de entrada y salida , así como también
